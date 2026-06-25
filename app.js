@@ -123,7 +123,7 @@ async function initialize() {
     const [appModule, fire, auth] = await Promise.all([import(`${FIREBASE_BASE}/firebase-app.js`), import(`${FIREBASE_BASE}/firebase-firestore.js`), import(`${FIREBASE_BASE}/firebase-auth.js`)]);
     const app=appModule.initializeApp(firebaseConfig); let db;
     try { db=fire.initializeFirestore(app,{localCache:fire.persistentLocalCache({tabManager:fire.persistentMultipleTabManager()})}); } catch { db=fire.getFirestore(app); }
-    state.db=db; state.auth=auth.getAuth(app); state.f={...fire,...auth}; await auth.setPersistence(state.auth, auth.browserLocalPersistence); await auth.getRedirectResult(state.auth).catch(()=>null);
+    state.db=db; state.auth=auth.getAuth(app); state.f={...fire,...auth}; await auth.setPersistence(state.auth, auth.browserLocalPersistence);
     auth.onAuthStateChanged(state.auth, (user) => {
       state.user=user; renderAccount(); clearWorkspaceListeners();
       if (state.membershipUnsubscribe) { state.membershipUnsubscribe(); state.membershipUnsubscribe=null; }
@@ -137,7 +137,10 @@ async function googleSignIn() {
   const button=$("#google-signin-button"); busy(button,true,"Opening Google...");
   try {
     const provider=new state.f.GoogleAuthProvider(); provider.setCustomParameters({prompt:"select_account"});
-    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) await state.f.signInWithRedirect(state.auth,provider); else await state.f.signInWithPopup(state.auth,provider);
+    // Popup auth works across GitHub Pages, mobile browsers and installed PWAs.
+    // Redirect auth can lose its session because the Firebase helper runs on a
+    // different domain and modern browsers block that cross-site storage.
+    await state.f.signInWithPopup(state.auth, provider);
   } catch(error) {
     console.error("Google sign-in error:", error.code, error.message);
     const messages = {
