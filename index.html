@@ -854,7 +854,112 @@
     .member-row span:not(.role-badge) { color:var(--muted); font-size:.76rem; overflow-wrap:anywhere; }
     .approval-actions { display:flex; flex-wrap:wrap; gap:7px; }
     .compact { min-height:38px; padding:7px 10px; font-size:.72rem; }
-    @media (min-width:640px) { .onboarding-grid { grid-template-columns:repeat(2,1fr); } .workspace-id-row,.member-row { flex-direction:row; align-items:center; justify-content:space-between; } }  </style>
+    @media (min-width:640px) { .onboarding-grid { grid-template-columns:repeat(2,1fr); } .workspace-id-row,.member-row { flex-direction:row; align-items:center; justify-content:space-between; } }
+    .account-name {
+      display: block;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .member-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .role-select {
+      min-height: 38px;
+      padding: 7px 30px 7px 10px;
+      color: var(--text);
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .danger-zone {
+      border-color: #F2C7C3;
+      background: #FFF9F8;
+    }
+
+    .danger-zone h3 {
+      color: var(--red);
+    }
+
+    .danger-button {
+      min-height: 44px;
+      padding: 9px 16px;
+      color: white;
+      background: var(--red);
+      border: 1px solid var(--red);
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 520px) {
+      .app-header {
+        gap: 7px;
+        padding-right: 10px;
+        padding-left: 10px;
+      }
+
+      .brand {
+        flex: 1 1 auto;
+        gap: 7px;
+        overflow: hidden;
+      }
+
+      .brand-logo {
+        width: 43px;
+        height: 43px;
+      }
+
+      .brand-copy {
+        overflow: hidden;
+      }
+
+      .brand-name,
+      .brand-tagline {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .brand-tagline {
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      .header-actions {
+        flex: 0 1 auto;
+        min-width: 0;
+        gap: 5px;
+      }
+
+      .auth-button {
+        padding: 8px 10px;
+        font-size: 0.72rem;
+      }
+
+      .account-name {
+        max-width: 94px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .account-name {
+        max-width: 72px;
+      }
+
+      .brand-tagline {
+        font-size: 0.72rem;
+      }
+    }  </style>
 </head>
 
 <body>
@@ -875,7 +980,7 @@
     </div>
 
     <div class="header-actions">
-      <button id="account-button" class="auth-button" type="button">Sign in</button>
+      <button id="account-button" class="auth-button account-name" type="button" title="Account">Sign in</button>
       <button id="logout-button" class="auth-button logout hidden" type="button">Logout</button>
     </div>
   </header>
@@ -1103,6 +1208,7 @@
       <section id="active-temple-card" class="section-card hidden"><div class="workspace-id-row"><div><span class="workspace-label">Share this workspace ID</span><strong id="workspace-id">—</strong></div><button id="copy-workspace-id" class="secondary-button" type="button">Copy ID</button></div><p class="privacy-note">New members request access with this ID. The owner must approve them before they can see any records.</p></section>
       <section id="requests-card" class="section-card hidden"><h3 class="section-title">Pending Access Requests</h3><div id="requests-list" class="entry-list"></div></section>
       <section id="members-card" class="section-card hidden"><h3 class="section-title">Committee Members</h3><div id="members-list" class="entry-list"></div></section>
+      <section id="danger-zone" class="section-card danger-zone hidden"><h3 class="section-title">Delete Temple Workspace</h3><p class="privacy-note">This permanently deletes all donations, expenses, members and requests. This action cannot be undone.</p><button id="delete-temple-button" class="danger-button" type="button">Delete Workspace</button></section>
     </section>
   </main>
 
@@ -1141,6 +1247,6 @@
 
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-  <script type="module" src="./app.js?v=4"></script>
+  <script type="module" src="./app.js?v=5"></script>
 </body>
 </html>
