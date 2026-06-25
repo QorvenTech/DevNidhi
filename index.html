@@ -902,62 +902,61 @@
 
     @media (max-width: 520px) {
       .app-header {
-        gap: 7px;
-        padding-right: 10px;
-        padding-left: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 9px 12px 10px;
       }
 
       .brand {
-        flex: 1 1 auto;
-        gap: 7px;
-        overflow: hidden;
+        width: 100%;
+        gap: 9px;
+        overflow: visible;
       }
 
       .brand-logo {
-        width: 43px;
-        height: 43px;
+        width: 45px;
+        height: 45px;
       }
 
       .brand-copy {
-        overflow: hidden;
+        overflow: visible;
       }
 
       .brand-name,
       .brand-tagline {
-        overflow: hidden;
-        text-overflow: ellipsis;
+        overflow: visible;
+        text-overflow: clip;
+        white-space: normal;
       }
 
       .brand-tagline {
-        white-space: normal;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
+        display: block;
+        font-size: 0.78rem;
+        line-height: 1.2;
       }
 
       .header-actions {
-        flex: 0 1 auto;
+        width: 100%;
         min-width: 0;
-        gap: 5px;
+        justify-content: flex-end;
+        gap: 7px;
       }
 
       .auth-button {
-        padding: 8px 10px;
-        font-size: 0.72rem;
+        padding: 8px 12px;
+        font-size: 0.76rem;
       }
 
       .account-name {
-        max-width: 94px;
-      }
-    }
-
-    @media (max-width: 380px) {
-      .account-name {
-        max-width: 72px;
-      }
-
-      .brand-tagline {
-        font-size: 0.72rem;
+        width: auto;
+        max-width: calc(100% - 82px);
+        overflow: visible;
+        text-overflow: clip;
+        white-space: normal;
+        line-height: 1.2;
+        text-align: center;
+        overflow-wrap: anywhere;
       }
     }  </style>
 </head>
@@ -1247,6 +1246,6 @@
 
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-  <script type="module" src="./app.js?v=5"></script>
+  <script type="module" src="./app.js?v=6"></script>
 </body>
 </html>
