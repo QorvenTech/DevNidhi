@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#D4580A">
+  <meta name="description" content="DevNidhi - Mandir Nirman donation and expense management">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="DevNidhi">
+  <title>DevNidhi | मंदिर निर्माण कोष</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ---------- Theme and reset ---------- */
+    :root {
+      --primary: #D4580A;
+      --primary-dark: #A94105;
+      --primary-soft: #FFF0E6;
+      --cream: #FFF9F4;
+      --surface: #FFFFFF;
+      --text: #2C211B;
+      --muted: #776A62;
+      --border: #EEDFD5;
+      --green: #197B45;
+      --green-soft: #E9F7EF;
+      --red: #C43B36;
+      --red-soft: #FDEDEC;
+      --blue: #2468A2;
+      --blue-soft: #EAF3FB;
+      --shadow: 0 8px 28px rgba(76, 43, 22, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(212, 88, 10, 0.09), transparent 28rem),
+        var(--cream);
+      font-family: "Poppins", "Hind", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    a:focus-visible {
+      outline: 3px solid rgba(212, 88, 10, 0.25);
+      outline-offset: 2px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ---------- App header ---------- */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 72px;
+      padding: 10px max(16px, env(safe-area-inset-left));
+      background: rgba(255, 249, 244, 0.94);
+      border-bottom: 1px solid rgba(238, 223, 213, 0.85);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 auto;
+      filter: drop-shadow(0 5px 8px rgba(212, 88, 10, 0.18));
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-name {
+      margin: 0;
+      color: var(--primary-dark);
+      font-size: clamp(1.12rem, 4vw, 1.45rem);
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .brand-tagline {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-family: "Hind", sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.15;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .auth-button {
+      min-height: 38px;
+      padding: 8px 12px;
+      color: var(--primary-dark);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 0 3px 12px rgba(76, 43, 22, 0.05);
+    }
+
+    .auth-button:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .auth-button.logout {
+      color: var(--red);
+    }
+
+    /* ---------- General layout ---------- */
+    .app-main {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      padding: 22px 16px calc(96px + env(safe-area-inset-bottom));
+    }
+
+    .screen {
+      display: none;
+      animation: screen-in 220ms ease-out;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes screen-in {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-heading {
+      margin: 0;
+      font-size: clamp(1.45rem, 5vw, 2rem);
+      letter-spacing: -0.025em;
+    }
+
+    .page-subtitle {
+      margin: 4px 0 20px;
+      color: var(--muted);
+      font-family: "Hind", sans-serif;
+      font-size: 1rem;
+    }
+
+    .section-card {
+      margin-bottom: 18px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      font-size: 1.08rem;
+    }
+
+    /* ---------- Dashboard ---------- */
+    .welcome-card {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 18px;
+      padding: 22px;
+      color: white;
+      background: linear-gradient(135deg, #B94706, var(--primary) 60%, #ED8B35);
+      border-radius: 24px;
+      box-shadow: 0 14px 35px rgba(212, 88, 10, 0.23);
+    }
+
+    .welcome-card::after {
+      position: absolute;
+      right: -30px;
+      bottom: -56px;
+      width: 180px;
+      height: 180px;
+      content: "";
+      border: 28px solid rgba(255, 255, 255, 0.10);
+      border-radius: 50%;
+    }
+
+    .welcome-card h2 {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 6px;
+      font-family: "Hind", sans-serif;
+      font-size: clamp(1.45rem, 6vw, 2.1rem);
+      line-height: 1.25;
+    }
+
+    .welcome-card p {
+      position: relative;
+      z-index: 1;
+      max-width: 560px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.9rem;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 116px;
+      padding: 18px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .summary-card.donation {
+      color: var(--green);
+      background: var(--green-soft);
+      border-color: #CDEBD9;
+    }
+
+    .summary-card.expense {
+      color: var(--red);
+      background: var(--red-soft);
+      border-color: #F5D2D0;
+    }
+
+    .summary-card.balance {
+      color: var(--blue);
+      background: var(--blue-soft);
+      border-color: #D2E6F6;
+    }
+
+    .summary-icon {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      flex: 0 0 auto;
+      place-items: center;
+      color: white;
+      background: currentColor;
+      border-radius: 14px;
+    }
+
+    .summary-icon svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+
+    .summary-label {
+      margin: 0 0 3px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .summary-value {
+      margin: 0;
+      color: currentColor;
+      font-size: clamp(1.4rem, 6vw, 2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 17px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-number {
+      display: block;
+      color: var(--primary);
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-family: "Hind", sans-serif;
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Forms ---------- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label {
+      color: #56483F;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea,
+    .search-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 13px;
+      color: var(--text);
+      background: #FFFCFA;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .form-field textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus,
+    .search-input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(212, 88, 10, 0.12);
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .primary-button,
+    .secondary-button {
+      min-height: 46px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .primary-button {
+      color: white;
+      background: var(--primary);
+      border: 1px solid var(--primary);
+      box-shadow: 0 7px 18px rgba(212, 88, 10, 0.2);
+    }
+
+    .primary-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .primary-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .secondary-button {
+      color: var(--muted);
+      background: white;
+      border: 1px solid var(--border);
+    }
+
+    /* ---------- Search and entry list ---------- */
+    .list-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .list-toolbar h3 {
+      margin: 0;
+      font-size: 1.08rem;
+    }
+
+    .search-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      top: 50%;
+      left: 13px;
+      width: 19px;
+      height: 19px;
+      color: var(--muted);
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+
+    .search-input {
+      padding-left: 41px;
+    }
+
+    .entry-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .entry-card {
+      display: grid;
+      gap: 12px;
+      padding: 15px;
+      background: #FFFCFA;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+    }
+
+    .entry-main {
+      min-width: 0;
+    }
+
+    .entry-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .entry-title {
+      margin: 0;
+      font-size: 0.98rem;
+      overflow-wrap: anywhere;
+    }
+
+    .entry-amount {
+      margin: 0;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .entry-amount.income {
+      color: var(--green);
+    }
+
+    .entry-amount.outgoing {
+      color: var(--red);
+    }
+
+    .entry-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 8px;
+    }
+
+    .meta-chip {
+      padding: 4px 8px;
+      color: var(--muted);
+      background: #F5EEE9;
+      border-radius: 999px;
+      font-size: 0.72rem;
+    }
+
+    .entry-note {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-family: "Hind", sans-serif;
+      font-size: 0.9rem;
+      overflow-wrap: anywhere;
+    }
+
+    .entry-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+    }
+
+    .icon-button {
+      display: inline-grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      color: var(--muted);
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .icon-button:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .icon-button.delete:hover {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    .icon-button svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .empty-state {
+      padding: 30px 16px;
+      color: var(--muted);
+      text-align: center;
+      background: #FFFCFA;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+    }
+
+    /* ---------- Login ---------- */
+    .login-shell {
+      width: min(100%, 440px);
+      margin: 5vh auto 0;
+    }
+
+    .login-card {
+      padding: 24px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .login-logo {
+      display: block;
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 12px;
+    }
+
+    .login-card h2,
+    .login-card > p {
+      text-align: center;
+    }
+
+    .login-card h2 {
+      margin: 0;
+    }
+
+    .login-card > p {
+      margin: 5px 0 20px;
+      color: var(--muted);
+      font-family: "Hind", sans-serif;
+    }
+
+    .login-submit {
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    /* ---------- Bottom navigation ---------- */
+    .bottom-nav {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 40;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      padding: 8px max(12px, env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom));
+      background: rgba(255, 255, 255, 0.96);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -8px 24px rgba(76, 43, 22, 0.08);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      min-height: 54px;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-radius: 13px;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+
+    .nav-button svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .nav-button.active {
+      color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    /* ---------- Status UI ---------- */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 249, 244, 0.88);
+      backdrop-filter: blur(4px);
+    }
+
+    .loading-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-family: "Hind", sans-serif;
+    }
+
+    .spinner {
+      width: 42px;
+      height: 42px;
+      border: 4px solid #F1D9C9;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 750ms linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 82px;
+      right: 14px;
+      left: 14px;
+      z-index: 110;
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      width: min(100%, 440px);
+      padding: 12px 15px;
+      color: white;
+      background: #3D342F;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(44, 33, 27, 0.2);
+      font-size: 0.86rem;
+      animation: toast-in 200ms ease-out;
+    }
+
+    .toast.success {
+      background: var(--green);
+    }
+
+    .toast.error {
+      background: var(--red);
+    }
+
+    @keyframes toast-in {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+    }
+
+    .offline-banner,
+    .config-banner {
+      display: none;
+      padding: 9px 16px;
+      color: #6E3B05;
+      background: #FFF1C8;
+      border-bottom: 1px solid #F0D486;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    .offline-banner.show,
+    .config-banner.show {
+      display: block;
+    }
+
+    .config-banner {
+      color: #7A281F;
+      background: #FDE7E3;
+      border-color: #F4C8C2;
+    }
+
+    @media (min-width: 640px) {
+      .app-header {
+        padding-right: 24px;
+        padding-left: 24px;
+      }
+
+      .app-main {
+        padding-right: 24px;
+        padding-left: 24px;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .summary-card {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .list-toolbar {
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .search-wrap {
+        max-width: 340px;
+      }
+
+      .entry-card {
+        grid-template-columns: 1fr auto;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .app-main {
+        padding-top: 30px;
+      }
+
+      .summary-card {
+        align-items: center;
+        flex-direction: row;
+      }
+
+      .bottom-nav {
+        right: auto;
+        left: 50%;
+        width: 520px;
+        bottom: 14px;
+        padding: 7px;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="offline-banner" class="offline-banner" role="status">
+    आप ऑफलाइन हैं — पहले से सिंक किया हुआ डेटा दिखाया जा रहा है।
+  </div>
+  <div id="config-banner" class="config-banner" role="alert">
+    Firebase जोड़ने के लिए firebase-config.js में अपनी project credentials भरें।
+  </div>
+
+  <header class="app-header">
+    <div class="brand">
+      <img class="brand-logo" src="./logo.svg" alt="DevNidhi logo">
+      <div class="brand-copy">
+        <h1 class="brand-name">DevNidhi</h1>
+        <p class="brand-tagline">देवनिधि · मंदिर निर्माण कोष</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="login-header-button" class="auth-button" type="button">Admin Login</button>
+      <button id="logout-button" class="auth-button logout hidden" type="button">Logout</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- Dashboard screen -->
+    <section id="dashboard-screen" class="screen active" aria-labelledby="dashboard-title">
+      <div class="welcome-card">
+        <h2 id="dashboard-title">मंदिर निर्माण, सबका संकल्प</h2>
+        <p>Donations, expenses and the available construction fund — clear and accessible in one place.</p>
+      </div>
+
+      <div class="summary-grid">
+        <article class="summary-card donation">
+          <div class="summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div>
+            <p class="summary-label">Total Chanda · कुल चंदा</p>
+            <p id="total-chanda" class="summary-value">₹0</p>
+          </div>
+        </article>
+
+        <article class="summary-card expense">
+          <div class="summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M7 6V4h10v2M5 6l1 15h12l1-15M9 10v7M15 10v7"/>
+            </svg>
+          </div>
+          <div>
+            <p class="summary-label">Total Kharcha · कुल खर्च</p>
+            <p id="total-kharcha" class="summary-value">₹0</p>
+          </div>
+        </article>
+
+        <article class="summary-card balance">
+          <div class="summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="5" width="18" height="14" rx="2"/>
+              <path d="M16 12h5M7 9h4"/>
+            </svg>
+          </div>
+          <div>
+            <p class="summary-label">Net Balance · शेष राशि</p>
+            <p id="net-balance" class="summary-value">₹0</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card">
+          <span id="total-donors" class="stat-number">0</span>
+          <span class="stat-label">कुल दानदाता</span>
+        </article>
+        <article class="stat-card">
+          <span id="total-expenses" class="stat-number">0</span>
+          <span class="stat-label">खर्च प्रविष्टियाँ</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- Chanda screen -->
+    <section id="chanda-screen" class="screen" aria-labelledby="chanda-title">
+      <h2 id="chanda-title" class="page-heading">Chanda</h2>
+      <p class="page-subtitle">मंदिर निर्माण हेतु प्राप्त सभी दान</p>
+
+      <section id="chanda-admin-panel" class="section-card hidden">
+        <h3 id="chanda-form-title" class="section-title">Add Chanda</h3>
+        <form id="chanda-form">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="donor-name">Donor Name / दानदाता का नाम</label>
+              <input id="donor-name" name="donorName" type="text" maxlength="100" required autocomplete="name">
+            </div>
+            <div class="form-field">
+              <label for="chanda-amount">Amount / राशि ₹</label>
+              <input id="chanda-amount" name="amount" type="number" min="1" step="0.01" inputmode="decimal" required>
+            </div>
+            <div class="form-field">
+              <label for="chanda-date">Date / दिनांक</label>
+              <input id="chanda-date" name="date" type="date" required>
+            </div>
+            <div class="form-field">
+              <label for="payment-mode">Payment Mode / भुगतान माध्यम</label>
+              <select id="payment-mode" name="paymentMode" required>
+                <option value="Cash">Cash</option>
+                <option value="Online">Online</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label for="chanda-note">Note / टिप्पणी (optional)</label>
+              <textarea id="chanda-note" name="note" maxlength="300"></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button id="chanda-submit" class="primary-button" type="submit">Save Chanda</button>
+            <button id="chanda-cancel" class="secondary-button hidden" type="button">Cancel Edit</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="section-card">
+        <div class="list-toolbar">
+          <h3>All Donations</h3>
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="m20 20-3.5-3.5"/>
+            </svg>
+            <input id="chanda-search" class="search-input" type="search" placeholder="Search donor name..." aria-label="Search donations by donor name">
+          </div>
+        </div>
+        <div id="chanda-list" class="entry-list">
+          <div class="empty-state">No donation entries yet.</div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Kharcha screen -->
+    <section id="kharcha-screen" class="screen" aria-labelledby="kharcha-title">
+      <h2 id="kharcha-title" class="page-heading">Kharcha</h2>
+      <p class="page-subtitle">मंदिर निर्माण के सभी खर्चों का विवरण</p>
+
+      <section id="kharcha-admin-panel" class="section-card hidden">
+        <h3 id="kharcha-form-title" class="section-title">Add Kharcha</h3>
+        <form id="kharcha-form">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="expense-description">Description / खर्च का विवरण</label>
+              <input id="expense-description" name="description" type="text" maxlength="140" required>
+            </div>
+            <div class="form-field">
+              <label for="kharcha-amount">Amount / राशि ₹</label>
+              <input id="kharcha-amount" name="amount" type="number" min="1" step="0.01" inputmode="decimal" required>
+            </div>
+            <div class="form-field">
+              <label for="kharcha-date">Date / दिनांक</label>
+              <input id="kharcha-date" name="date" type="date" required>
+            </div>
+            <div class="form-field">
+              <label for="expense-category">Category / श्रेणी</label>
+              <select id="expense-category" name="category" required>
+                <option value="Nirman Samagri">Nirman Samagri</option>
+                <option value="Mazdoori">Mazdoori</option>
+                <option value="Pooja Samagri">Pooja Samagri</option>
+                <option value="Transport">Transport</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label for="kharcha-note">Note / टिप्पणी (optional)</label>
+              <textarea id="kharcha-note" name="note" maxlength="300"></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button id="kharcha-submit" class="primary-button" type="submit">Save Kharcha</button>
+            <button id="kharcha-cancel" class="secondary-button hidden" type="button">Cancel Edit</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="section-card">
+        <div class="list-toolbar">
+          <h3>All Expenses</h3>
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="m20 20-3.5-3.5"/>
+            </svg>
+            <input id="kharcha-search" class="search-input" type="search" placeholder="Search description..." aria-label="Search expenses by description">
+          </div>
+        </div>
+        <div id="kharcha-list" class="entry-list">
+          <div class="empty-state">No expense entries yet.</div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Admin login screen -->
+    <section id="login-screen" class="screen" aria-labelledby="login-title">
+      <div class="login-shell">
+        <div class="login-card">
+          <img class="login-logo" src="./logo.svg" alt="">
+          <h2 id="login-title">Admin Login</h2>
+          <p>केवल अधिकृत समिति सदस्य</p>
+          <form id="login-form">
+            <div class="form-field">
+              <label for="admin-email">Email</label>
+              <input id="admin-email" name="email" type="email" autocomplete="username" required>
+            </div>
+            <div class="form-field" style="margin-top: 13px;">
+              <label for="admin-password">Password</label>
+              <input id="admin-password" name="password" type="password" autocomplete="current-password" required minlength="6">
+            </div>
+            <button id="login-submit" class="primary-button login-submit" type="submit">Sign In</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav id="bottom-nav" class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-button active" type="button" data-screen="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M3 11 12 3l9 8"/>
+        <path d="M5 10v10h14V10M9 20v-6h6v6"/>
+      </svg>
+      Dashboard
+    </button>
+    <button class="nav-button" type="button" data-screen="chanda">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M15.5 8.5h-5a2.5 2.5 0 0 0 0 5h3a2.5 2.5 0 0 1 0 5H8.5M12 6v13"/>
+      </svg>
+      Chanda
+    </button>
+    <button class="nav-button" type="button" data-screen="kharcha">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M4 7h16M6 7l1 13h10l1-13M9 7V4h6v3M10 11v5M14 11v5"/>
+      </svg>
+      Kharcha
+    </button>
+  </nav>
+
+  <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
+    <div class="loading-box">
+      <div class="spinner" aria-hidden="true"></div>
+      <span>डेटा लोड हो रहा है...</span>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script type="module">
+    /*
+     * DevNidhi application
+     * Uses Firebase modular SDK, Firestore real-time listeners and Firebase Auth.
+     * No application data is stored in localStorage.
+     */
+    import { firebaseConfig } from "./firebase-config.js";
+
+    const FIREBASE_VERSION = "10.12.2";
+    const FIREBASE_BASE = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}`;
+
+    const state = {
+      user: null,
+      db: null,
+      auth: null,
+      firebase: null,
+      chanda: [],
+      kharcha: [],
+      editingChandaId: null,
+      editingKharchaId: null,
+      dataReady: { chanda: false, kharcha: false },
+      configured: false
+    };
+
+    const elements = {
+      loading: document.querySelector("#loading-overlay"),
+      offlineBanner: document.querySelector("#offline-banner"),
+      configBanner: document.querySelector("#config-banner"),
+      toastContainer: document.querySelector("#toast-container"),
+      loginHeaderButton: document.querySelector("#login-header-button"),
+      logoutButton: document.querySelector("#logout-button"),
+      bottomNav: document.querySelector("#bottom-nav"),
+      screens: document.querySelectorAll(".screen"),
+      navButtons: document.querySelectorAll(".nav-button"),
+      chandaAdminPanel: document.querySelector("#chanda-admin-panel"),
+      kharchaAdminPanel: document.querySelector("#kharcha-admin-panel"),
+      chandaForm: document.querySelector("#chanda-form"),
+      kharchaForm: document.querySelector("#kharcha-form"),
+      loginForm: document.querySelector("#login-form"),
+      chandaList: document.querySelector("#chanda-list"),
+      kharchaList: document.querySelector("#kharcha-list"),
+      chandaSearch: document.querySelector("#chanda-search"),
+      kharchaSearch: document.querySelector("#kharcha-search"),
+      chandaCancel: document.querySelector("#chanda-cancel"),
+      kharchaCancel: document.querySelector("#kharcha-cancel")
+    };
+
+    // ---------- Formatting and safe rendering helpers ----------
+    const currencyFormatter = new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2
+    });
+
+    function formatCurrency(value) {
+      return currencyFormatter.format(Number(value) || 0);
+    }
+
+    function formatDate(value) {
+      const date = value?.toDate ? value.toDate() : new Date(value);
+      if (Number.isNaN(date.getTime())) return "—";
+      return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      }).format(date);
+    }
+
+    function dateToInputValue(value) {
+      const date = value?.toDate ? value.toDate() : new Date(value);
+      if (Number.isNaN(date.getTime())) return getTodayValue();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function getTodayValue() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset();
+      return new Date(now.getTime() - offset * 60_000).toISOString().slice(0, 10);
+    }
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function showToast(message, type = "") {
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`.trim();
+      toast.textContent = message;
+      elements.toastContainer.appendChild(toast);
+      window.setTimeout(() => toast.remove(), 3600);
+    }
+
+    function setButtonBusy(button, busy, busyText) {
+      if (!button) return;
+      if (busy) {
+        button.dataset.originalText = button.textContent;
+        button.textContent = busyText;
+        button.disabled = true;
+      } else {
+        button.textContent = button.dataset.originalText || button.textContent;
+        button.disabled = false;
+      }
+    }
+
+    function firebaseIsConfigured() {
+      const required = ["apiKey", "authDomain", "projectId", "appId"];
+      return required.every((key) => {
+        const value = firebaseConfig[key];
+        return value && !String(value).startsWith("YOUR_");
+      });
+    }
+
+    // ---------- Navigation ----------
+    function showScreen(screenName) {
+      elements.screens.forEach((screen) => {
+        screen.classList.toggle("active", screen.id === `${screenName}-screen`);
+      });
+      elements.navButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.screen === screenName);
+      });
+      elements.bottomNav.classList.toggle("hidden", screenName === "login");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    elements.navButtons.forEach((button) => {
+      button.addEventListener("click", () => showScreen(button.dataset.screen));
+    });
+
+    elements.loginHeaderButton.addEventListener("click", () => showScreen("login"));
+
+    // ---------- Dashboard and lists ----------
+    function renderDashboard() {
+      const totalChanda = state.chanda.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const totalKharcha = state.kharcha.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const uniqueDonors = new Set(
+        state.chanda.map((item) => String(item.donorName || "").trim().toLocaleLowerCase("en-IN")).filter(Boolean)
+      );
+
+      document.querySelector("#total-chanda").textContent = formatCurrency(totalChanda);
+      document.querySelector("#total-kharcha").textContent = formatCurrency(totalKharcha);
+      document.querySelector("#net-balance").textContent = formatCurrency(totalChanda - totalKharcha);
+      document.querySelector("#total-donors").textContent = String(uniqueDonors.size);
+      document.querySelector("#total-expenses").textContent = String(state.kharcha.length);
+    }
+
+    const editIcon = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+      </svg>`;
+    const deleteIcon = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7M14 10v7"/>
+      </svg>`;
+
+    function renderChandaList() {
+      const term = elements.chandaSearch.value.trim().toLocaleLowerCase("en-IN");
+      const filtered = state.chanda.filter((entry) =>
+        String(entry.donorName || "").toLocaleLowerCase("en-IN").includes(term)
+      );
+
+      if (!filtered.length) {
+        elements.chandaList.innerHTML = `<div class="empty-state">${
+          term ? "No matching donor found." : "No donation entries yet."
+        }</div>`;
+        return;
+      }
+
+      elements.chandaList.innerHTML = filtered.map((entry) => `
+        <article class="entry-card">
+          <div class="entry-main">
+            <div class="entry-title-row">
+              <h4 class="entry-title">${escapeHtml(entry.donorName)}</h4>
+              <p class="entry-amount income">${formatCurrency(entry.amount)}</p>
+            </div>
+            <div class="entry-meta">
+              <span class="meta-chip">${formatDate(entry.date)}</span>
+              <span class="meta-chip">${escapeHtml(entry.paymentMode)}</span>
+            </div>
+            ${entry.note ? `<p class="entry-note">${escapeHtml(entry.note)}</p>` : ""}
+          </div>
+          ${state.user ? `
+            <div class="entry-actions">
+              <button class="icon-button" type="button" data-action="edit-chanda" data-id="${entry.id}" aria-label="Edit donation">${editIcon}</button>
+              <button class="icon-button delete" type="button" data-action="delete-chanda" data-id="${entry.id}" aria-label="Delete donation">${deleteIcon}</button>
+            </div>` : ""}
+        </article>
+      `).join("");
+    }
+
+    function renderKharchaList() {
+      const term = elements.kharchaSearch.value.trim().toLocaleLowerCase("en-IN");
+      const filtered = state.kharcha.filter((entry) =>
+        String(entry.description || "").toLocaleLowerCase("en-IN").includes(term)
+      );
+
+      if (!filtered.length) {
+        elements.kharchaList.innerHTML = `<div class="empty-state">${
+          term ? "No matching expense found." : "No expense entries yet."
+        }</div>`;
+        return;
+      }
+
+      elements.kharchaList.innerHTML = filtered.map((entry) => `
+        <article class="entry-card">
+          <div class="entry-main">
+            <div class="entry-title-row">
+              <h4 class="entry-title">${escapeHtml(entry.description)}</h4>
+              <p class="entry-amount outgoing">${formatCurrency(entry.amount)}</p>
+            </div>
+            <div class="entry-meta">
+              <span class="meta-chip">${formatDate(entry.date)}</span>
+              <span class="meta-chip">${escapeHtml(entry.category)}</span>
+            </div>
+            ${entry.note ? `<p class="entry-note">${escapeHtml(entry.note)}</p>` : ""}
+          </div>
+          ${state.user ? `
+            <div class="entry-actions">
+              <button class="icon-button" type="button" data-action="edit-kharcha" data-id="${entry.id}" aria-label="Edit expense">${editIcon}</button>
+              <button class="icon-button delete" type="button" data-action="delete-kharcha" data-id="${entry.id}" aria-label="Delete expense">${deleteIcon}</button>
+            </div>` : ""}
+        </article>
+      `).join("");
+    }
+
+    function renderAll() {
+      renderDashboard();
+      renderChandaList();
+      renderKharchaList();
+    }
+
+    elements.chandaSearch.addEventListener("input", renderChandaList);
+    elements.kharchaSearch.addEventListener("input", renderKharchaList);
+
+    // ---------- Admin state and form reset ----------
+    function updateAuthUI(user) {
+      state.user = user;
+      const isAdmin = Boolean(user);
+      elements.loginHeaderButton.classList.toggle("hidden", isAdmin);
+      elements.logoutButton.classList.toggle("hidden", !isAdmin);
+      elements.chandaAdminPanel.classList.toggle("hidden", !isAdmin);
+      elements.kharchaAdminPanel.classList.toggle("hidden", !isAdmin);
+      if (!isAdmin) {
+        resetChandaForm();
+        resetKharchaForm();
+      }
+      renderChandaList();
+      renderKharchaList();
+    }
+
+    function resetChandaForm() {
+      state.editingChandaId = null;
+      elements.chandaForm.reset();
+      document.querySelector("#chanda-date").value = getTodayValue();
+      document.querySelector("#chanda-form-title").textContent = "Add Chanda";
+      document.querySelector("#chanda-submit").textContent = "Save Chanda";
+      elements.chandaCancel.classList.add("hidden");
+    }
+
+    function resetKharchaForm() {
+      state.editingKharchaId = null;
+      elements.kharchaForm.reset();
+      document.querySelector("#kharcha-date").value = getTodayValue();
+      document.querySelector("#kharcha-form-title").textContent = "Add Kharcha";
+      document.querySelector("#kharcha-submit").textContent = "Save Kharcha";
+      elements.kharchaCancel.classList.add("hidden");
+    }
+
+    resetChandaForm();
+    resetKharchaForm();
+
+    // ---------- Firebase initialization ----------
+    async function initializeFirebase() {
+      if (!firebaseIsConfigured()) {
+        state.configured = false;
+        elements.configBanner.classList.add("show");
+        elements.loading.classList.add("hidden");
+        showToast("Firebase credentials अभी जोड़नी बाकी हैं।", "error");
+        return;
+      }
+
+      try {
+        const [
+          appModule,
+          firestoreModule,
+          authModule
+        ] = await Promise.all([
+          import(`${FIREBASE_BASE}/firebase-app.js`),
+          import(`${FIREBASE_BASE}/firebase-firestore.js`),
+          import(`${FIREBASE_BASE}/firebase-auth.js`)
+        ]);
+
+        const app = appModule.initializeApp(firebaseConfig);
+
+        // Firestore persistent cache uses IndexedDB, not localStorage.
+        // It keeps previously synced records viewable while offline.
+        let db;
+        try {
+          db = firestoreModule.initializeFirestore(app, {
+            localCache: firestoreModule.persistentLocalCache({
+              tabManager: firestoreModule.persistentMultipleTabManager()
+            })
+          });
+        } catch (cacheError) {
+          console.warn("Persistent cache unavailable; using standard Firestore instance.", cacheError);
+          db = firestoreModule.getFirestore(app);
+        }
+
+        state.db = db;
+        state.auth = authModule.getAuth(app);
+        state.firebase = { ...firestoreModule, ...authModule };
+        state.configured = true;
+
+        authModule.onAuthStateChanged(state.auth, (user) => {
+          updateAuthUI(user);
+          if (user && document.querySelector("#login-screen").classList.contains("active")) {
+            showScreen("dashboard");
+          }
+        });
+
+        subscribeToCollections();
+      } catch (error) {
+        console.error("Firebase initialization failed:", error);
+        elements.loading.classList.add("hidden");
+        showToast("Firebase शुरू नहीं हो सका। Configuration और internet जाँचें।", "error");
+      }
+    }
+
+    function subscribeToCollections() {
+      const { collection, query, orderBy, onSnapshot } = state.firebase;
+
+      const chandaQuery = query(collection(state.db, "chanda"), orderBy("date", "desc"));
+      const kharchaQuery = query(collection(state.db, "kharcha"), orderBy("date", "desc"));
+
+      onSnapshot(chandaQuery, { includeMetadataChanges: true }, (snapshot) => {
+        state.chanda = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+        state.dataReady.chanda = true;
+        renderAll();
+        finishInitialLoading();
+      }, handleSnapshotError);
+
+      onSnapshot(kharchaQuery, { includeMetadataChanges: true }, (snapshot) => {
+        state.kharcha = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+        state.dataReady.kharcha = true;
+        renderAll();
+        finishInitialLoading();
+      }, handleSnapshotError);
+    }
+
+    function handleSnapshotError(error) {
+      console.error("Firestore listener error:", error);
+      elements.loading.classList.add("hidden");
+      if (error.code === "permission-denied") {
+        showToast("Firestore rules data पढ़ने की अनुमति नहीं दे रहे हैं।", "error");
+      } else {
+        showToast("डेटा लोड नहीं हुआ। Internet और Firebase settings जाँचें।", "error");
+      }
+    }
+
+    function finishInitialLoading() {
+      if (state.dataReady.chanda && state.dataReady.kharcha) {
+        elements.loading.classList.add("hidden");
+      }
+    }
+
+    // ---------- Authentication ----------
+    elements.loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!state.configured) {
+        showToast("पहले Firebase configuration जोड़ें।", "error");
+        return;
+      }
+
+      const submitButton = document.querySelector("#login-submit");
+      const formData = new FormData(elements.loginForm);
+      setButtonBusy(submitButton, true, "Signing in...");
+
+      try {
+        await state.firebase.signInWithEmailAndPassword(
+          state.auth,
+          String(formData.get("email")).trim(),
+          String(formData.get("password"))
+        );
+        elements.loginForm.reset();
+        showToast("Admin login successful.", "success");
+        showScreen("dashboard");
+      } catch (error) {
+        console.error("Login failed:", error);
+        showToast("Email या password सही नहीं है।", "error");
+      } finally {
+        setButtonBusy(submitButton, false);
+      }
+    });
+
+    elements.logoutButton.addEventListener("click", async () => {
+      if (!state.auth) return;
+      try {
+        await state.firebase.signOut(state.auth);
+        showToast("Logged out successfully.", "success");
+        showScreen("dashboard");
+      } catch (error) {
+        console.error("Logout failed:", error);
+        showToast("Logout नहीं हो सका।", "error");
+      }
+    });
+
+    // ---------- Create and update records ----------
+    function inputDateToTimestamp(dateValue) {
+      // Noon local time avoids timezone shifts changing the selected calendar date.
+      return state.firebase.Timestamp.fromDate(new Date(`${dateValue}T12:00:00`));
+    }
+
+    elements.chandaForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!state.user || !state.configured) return;
+
+      const button = document.querySelector("#chanda-submit");
+      const data = new FormData(elements.chandaForm);
+      const amount = Number(data.get("amount"));
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showToast("कृपया सही राशि दर्ज करें।", "error");
+        return;
+      }
+
+      const record = {
+        donorName: String(data.get("donorName")).trim(),
+        amount,
+        date: inputDateToTimestamp(data.get("date")),
+        paymentMode: String(data.get("paymentMode")),
+        note: String(data.get("note")).trim()
+      };
+
+      setButtonBusy(button, true, "Saving...");
+      try {
+        if (state.editingChandaId) {
+          const reference = state.firebase.doc(state.db, "chanda", state.editingChandaId);
+          await state.firebase.updateDoc(reference, record);
+          showToast("Chanda entry updated.", "success");
+        } else {
+          await state.firebase.addDoc(state.firebase.collection(state.db, "chanda"), {
+            ...record,
+            createdAt: state.firebase.serverTimestamp()
+          });
+          showToast("Chanda entry saved.", "success");
+        }
+        resetChandaForm();
+      } catch (error) {
+        console.error("Saving donation failed:", error);
+        showToast("Chanda save नहीं हुआ। कृपया फिर प्रयास करें।", "error");
+      } finally {
+        setButtonBusy(button, false);
+      }
+    });
+
+    elements.kharchaForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!state.user || !state.configured) return;
+
+      const button = document.querySelector("#kharcha-submit");
+      const data = new FormData(elements.kharchaForm);
+      const amount = Number(data.get("amount"));
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showToast("कृपया सही राशि दर्ज करें।", "error");
+        return;
+      }
+
+      const record = {
+        description: String(data.get("description")).trim(),
+        amount,
+        date: inputDateToTimestamp(data.get("date")),
+        category: String(data.get("category")),
+        note: String(data.get("note")).trim()
+      };
+
+      setButtonBusy(button, true, "Saving...");
+      try {
+        if (state.editingKharchaId) {
+          const reference = state.firebase.doc(state.db, "kharcha", state.editingKharchaId);
+          await state.firebase.updateDoc(reference, record);
+          showToast("Kharcha entry updated.", "success");
+        } else {
+          await state.firebase.addDoc(state.firebase.collection(state.db, "kharcha"), {
+            ...record,
+            createdAt: state.firebase.serverTimestamp()
+          });
+          showToast("Kharcha entry saved.", "success");
+        }
+        resetKharchaForm();
+      } catch (error) {
+        console.error("Saving expense failed:", error);
+        showToast("Kharcha save नहीं हुआ। कृपया फिर प्रयास करें।", "error");
+      } finally {
+        setButtonBusy(button, false);
+      }
+    });
+
+    elements.chandaCancel.addEventListener("click", resetChandaForm);
+    elements.kharchaCancel.addEventListener("click", resetKharchaForm);
+
+    // ---------- Edit and delete event delegation ----------
+    elements.chandaList.addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button || !state.user) return;
+      const entry = state.chanda.find((item) => item.id === button.dataset.id);
+      if (!entry) return;
+
+      if (button.dataset.action === "edit-chanda") {
+        state.editingChandaId = entry.id;
+        document.querySelector("#donor-name").value = entry.donorName || "";
+        document.querySelector("#chanda-amount").value = entry.amount || "";
+        document.querySelector("#chanda-date").value = dateToInputValue(entry.date);
+        document.querySelector("#payment-mode").value = entry.paymentMode || "Cash";
+        document.querySelector("#chanda-note").value = entry.note || "";
+        document.querySelector("#chanda-form-title").textContent = "Edit Chanda";
+        document.querySelector("#chanda-submit").textContent = "Update Chanda";
+        elements.chandaCancel.classList.remove("hidden");
+        elements.chandaAdminPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      if (button.dataset.action === "delete-chanda") {
+        const confirmed = window.confirm(`Delete donation from "${entry.donorName}"? This cannot be undone.`);
+        if (!confirmed) return;
+        try {
+          await state.firebase.deleteDoc(state.firebase.doc(state.db, "chanda", entry.id));
+          showToast("Chanda entry deleted.", "success");
+        } catch (error) {
+          console.error("Deleting donation failed:", error);
+          showToast("Entry delete नहीं हुई।", "error");
+        }
+      }
+    });
+
+    elements.kharchaList.addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button || !state.user) return;
+      const entry = state.kharcha.find((item) => item.id === button.dataset.id);
+      if (!entry) return;
+
+      if (button.dataset.action === "edit-kharcha") {
+        state.editingKharchaId = entry.id;
+        document.querySelector("#expense-description").value = entry.description || "";
+        document.querySelector("#kharcha-amount").value = entry.amount || "";
+        document.querySelector("#kharcha-date").value = dateToInputValue(entry.date);
+        document.querySelector("#expense-category").value = entry.category || "Other";
+        document.querySelector("#kharcha-note").value = entry.note || "";
+        document.querySelector("#kharcha-form-title").textContent = "Edit Kharcha";
+        document.querySelector("#kharcha-submit").textContent = "Update Kharcha";
+        elements.kharchaCancel.classList.remove("hidden");
+        elements.kharchaAdminPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      if (button.dataset.action === "delete-kharcha") {
+        const confirmed = window.confirm(`Delete expense "${entry.description}"? This cannot be undone.`);
+        if (!confirmed) return;
+        try {
+          await state.firebase.deleteDoc(state.firebase.doc(state.db, "kharcha", entry.id));
+          showToast("Kharcha entry deleted.", "success");
+        } catch (error) {
+          console.error("Deleting expense failed:", error);
+          showToast("Entry delete नहीं हुई।", "error");
+        }
+      }
+    });
+
+    // ---------- Connectivity and PWA ----------
+    function updateOnlineStatus() {
+      elements.offlineBanner.classList.toggle("show", !navigator.onLine);
+      if (navigator.onLine && state.configured) {
+        console.info("Back online. Firestore will synchronize pending changes.");
+      }
+    }
+
+    window.addEventListener("online", () => {
+      updateOnlineStatus();
+      showToast("Internet वापस आ गया — data sync हो रहा है।", "success");
+    });
+    window.addEventListener("offline", updateOnlineStatus);
+    updateOnlineStatus();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", async () => {
+        try {
+          await navigator.serviceWorker.register("./service-worker.js");
+        } catch (error) {
+          console.warn("Service worker registration failed:", error);
+        }
+      });
+    }
+
+    initializeFirebase();
+  </script>
+</body>
+</html>
