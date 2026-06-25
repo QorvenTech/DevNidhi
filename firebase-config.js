@@ -1,11 +1,11 @@
-﻿/*
+/*
  * Firebase web app configuration
  *
  * Configuration for the DevNidhi Firebase project.
  * Security is enforced through Firebase Authentication and Firestore rules.
  */
 export const firebaseConfig = {
-  apiKey: "AIzaSyBGDaxyn2d8yTUh7zb_P8adxCI-LFi2ygQ",
+  apiKey: "AIzaSyBGDaxyn2d8yTUhZzb_P8adxCT-LFj2yeQ",
   authDomain: "devnidhi-7d837.firebaseapp.com",
   projectId: "devnidhi-7d837",
   storageBucket: "devnidhi-7d837.firebasestorage.app",

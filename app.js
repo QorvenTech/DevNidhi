@@ -138,7 +138,19 @@ async function googleSignIn() {
   try {
     const provider=new state.f.GoogleAuthProvider(); provider.setCustomParameters({prompt:"select_account"});
     if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) await state.f.signInWithRedirect(state.auth,provider); else await state.f.signInWithPopup(state.auth,provider);
-  } catch(error) { console.error(error); if (error.code !== "auth/popup-closed-by-user") toast("Google sign-in failed. Check Firebase authorized domains.","error"); }
+  } catch(error) {
+    console.error("Google sign-in error:", error.code, error.message);
+    const messages = {
+      "auth/operation-not-allowed": "Google login is not enabled in Firebase Authentication.",
+      "auth/api-key-not-valid.-please-pass-a-valid-api-key.": "The Firebase API key is incorrect. Copy the configuration again from Firebase Project Settings.",
+      "auth/unauthorized-domain": "This website domain is not authorized in Firebase.",
+      "auth/popup-blocked": "The browser blocked the Google login popup. Allow popups and try again.",
+      "auth/popup-closed-by-user": "Google login was cancelled.",
+      "auth/network-request-failed": "Network error. Check your internet connection and try again.",
+      "auth/account-exists-with-different-credential": "This email already uses another login method."
+    };
+    toast(messages[error.code] || `Google sign-in failed (${error.code || "unknown error"}).`, "error");
+  }
   finally { busy(button,false); }
 }
 
