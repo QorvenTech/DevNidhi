@@ -958,6 +958,25 @@
         text-align: center;
         overflow-wrap: anywhere;
       }
+    }
+    .rename-temple-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media (max-width: 520px) {
+      .rename-temple-form {
+        grid-template-columns: 1fr;
+      }
+
+      .rename-temple-form .primary-button {
+        width: 100%;
+      }
     }  </style>
 </head>
 
@@ -1204,7 +1223,17 @@
       </div>
 
       <section id="my-temples-card" class="section-card hidden"><h3 class="section-title">My Temples</h3><div id="temple-switcher" class="temple-switcher"></div></section>
-      <section id="active-temple-card" class="section-card hidden"><div class="workspace-id-row"><div><span class="workspace-label">Share this workspace ID</span><strong id="workspace-id">—</strong></div><button id="copy-workspace-id" class="secondary-button" type="button">Copy ID</button></div><p class="privacy-note">New members request access with this ID. The owner must approve them before they can see any records.</p></section>
+      <section id="active-temple-card" class="section-card hidden">
+        <form id="rename-temple-form" class="rename-temple-form hidden">
+          <div class="form-field">
+            <label for="rename-temple-input">Temple / Project Name</label>
+            <input id="rename-temple-input" name="templeName" type="text" maxlength="100" required>
+          </div>
+          <button class="primary-button" type="submit">Save New Name</button>
+        </form>
+        <div class="workspace-id-row"><div><span class="workspace-label">Share this workspace ID</span><strong id="workspace-id">—</strong></div><button id="copy-workspace-id" class="secondary-button" type="button">Copy ID</button></div>
+        <p class="privacy-note">New members request access with this ID. The owner must approve them before they can see any records.</p>
+      </section>
       <section id="requests-card" class="section-card hidden"><h3 class="section-title">Pending Access Requests</h3><div id="requests-list" class="entry-list"></div></section>
       <section id="members-card" class="section-card hidden"><h3 class="section-title">Committee Members</h3><div id="members-list" class="entry-list"></div></section>
       <section id="danger-zone" class="section-card danger-zone hidden"><h3 class="section-title">Delete Temple Workspace</h3><p class="privacy-note">This permanently deletes all donations, expenses, members and requests. This action cannot be undone.</p><button id="delete-temple-button" class="danger-button" type="button">Delete Workspace</button></section>
@@ -1246,6 +1275,6 @@
 
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-  <script type="module" src="./app.js?v=6"></script>
+  <script type="module" src="./app.js?v=7"></script>
 </body>
 </html>

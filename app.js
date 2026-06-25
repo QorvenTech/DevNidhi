@@ -21,7 +21,7 @@ const elements = {
   chandaForm: $("#chanda-form"), kharchaForm: $("#kharcha-form"), chandaList: $("#chanda-list"), kharchaList: $("#kharcha-list"),
   chandaSearch: $("#chanda-search"), kharchaSearch: $("#kharcha-search"), chandaCancel: $("#chanda-cancel"), kharchaCancel: $("#kharcha-cancel"),
   createTempleForm: $("#create-temple-form"), joinTempleForm: $("#join-temple-form"), templeSwitcher: $("#temple-switcher"),
-  myTemplesCard: $("#my-temples-card"), activeTempleCard: $("#active-temple-card"), workspaceId: $("#workspace-id"),
+  myTemplesCard: $("#my-temples-card"), activeTempleCard: $("#active-temple-card"), workspaceId: $("#workspace-id"), renameTempleForm: $("#rename-temple-form"), renameTempleInput: $("#rename-temple-input"),
   requestsCard: $("#requests-card"), requestsList: $("#requests-list"), membersCard: $("#members-card"), membersList: $("#members-list"), dangerZone: $("#danger-zone"), deleteTempleButton: $("#delete-temple-button")
 };
 
@@ -81,9 +81,10 @@ function renderWorkspace() {
   elements.chandaAdminPanel.classList.toggle("hidden", !canEdit()); elements.kharchaAdminPanel.classList.toggle("hidden", !canEdit());
   elements.myTemplesCard.classList.toggle("hidden", !state.memberships.length);
   elements.activeTempleCard.classList.toggle("hidden", !active); elements.membersCard.classList.toggle("hidden", !active);
+  elements.renameTempleForm.classList.toggle("hidden", !active || !isOwner());
   elements.requestsCard.classList.toggle("hidden", !active || !isOwner());
   elements.dangerZone.classList.toggle("hidden", !active || !isOwner());
-  if (active) { elements.workspaceName.textContent = active.templeName; elements.workspaceRole.textContent = active.role[0].toUpperCase() + active.role.slice(1); elements.workspaceId.textContent = active.templeId; }
+  if (active) { elements.workspaceName.textContent = active.templeName; elements.workspaceRole.textContent = active.role[0].toUpperCase() + active.role.slice(1); elements.workspaceId.textContent = active.templeId; elements.renameTempleInput.value = active.templeName; }
   elements.templeSwitcher.innerHTML = state.memberships.map((m) => `<button class="temple-choice ${m.templeId === active?.templeId ? "active" : ""}" data-temple-id="${m.templeId}"><strong>${escapeHtml(m.templeName)}</strong><span>${escapeHtml(m.role)}</span></button>`).join("");
   elements.membersList.innerHTML = state.members.length ? state.members.map((m) => {
     const owner = m.role === "owner";
@@ -189,6 +190,42 @@ async function approveRequest(uid,role) {
   try { const batch=state.f.writeBatch(state.db); batch.set(state.f.doc(state.db,"memberships",membershipId(uid,tid)),{uid,templeId:tid,templeName:state.activeMembership.templeName,displayName:request.displayName||"",email:request.email||"",role,createdAt:state.f.serverTimestamp()}); batch.delete(state.f.doc(state.db,"temples",tid,"joinRequests",uid)); await batch.commit(); toast(`Member approved as ${role}.`,"success"); } catch(error){console.error(error);toast("Member could not be approved.","error");}
 }
 
+async function renameTemple(event) {
+  event.preventDefault();
+  if (!isOwner()) return;
+  const button = event.submitter;
+  const newName = String(new FormData(event.currentTarget).get("templeName")).trim();
+  if (!newName) return;
+  if (newName === state.activeMembership.templeName) {
+    toast("This is already the current temple name.");
+    return;
+  }
+
+  busy(button, true, "Saving...");
+  const templeId = state.activeMembership.templeId;
+  try {
+    const membershipSnapshot = await state.f.getDocs(state.f.query(state.f.collection(state.db, "memberships"), state.f.where("templeId", "==", templeId)));
+    const documents = membershipSnapshot.docs;
+
+    for (let start = 0; start < documents.length; start += 400) {
+      const batch = state.f.writeBatch(state.db);
+      if (start === 0) batch.update(state.f.doc(state.db, "temples", templeId), { name: newName });
+      documents.slice(start, start + 400).forEach((document) => batch.update(document.ref, { templeName: newName }));
+      await batch.commit();
+    }
+
+    if (!documents.length) await state.f.updateDoc(state.f.doc(state.db, "temples", templeId), { name: newName });
+    state.activeMembership.templeName = newName;
+    state.memberships.forEach((membership) => { if (membership.templeId === templeId) membership.templeName = newName; });
+    renderWorkspace();
+    toast("Temple name updated for all members.", "success");
+  } catch (error) {
+    console.error(error);
+    toast("Temple name could not be updated.", "error");
+  } finally {
+    busy(button, false);
+  }
+}
 async function changeMemberRole(memberId, role) {
   if (!isOwner() || !["admin", "viewer"].includes(role)) return;
   const member = state.members.find((item) => item.id === memberId);
@@ -283,6 +320,7 @@ elements.accountButton.addEventListener("click",()=>showScreen(state.user?"templ
 $("#google-signin-button").addEventListener("click",googleSignIn);
 elements.logoutButton.addEventListener("click",async()=>{await state.f.signOut(state.auth);toast("Signed out.","success");});
 elements.createTempleForm.addEventListener("submit",createTemple); elements.joinTempleForm.addEventListener("submit",requestAccess);
+elements.renameTempleForm.addEventListener("submit", renameTemple);
 elements.templeSwitcher.addEventListener("click",(e)=>{const b=e.target.closest("button[data-temple-id]");if(b)activateTemple(state.memberships.find(m=>m.templeId===b.dataset.templeId));});
 $("#copy-workspace-id").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(state.activeMembership.templeId);toast("Workspace ID copied.","success");}catch{toast(`Workspace ID: ${state.activeMembership.templeId}`);}});
 elements.membersList.addEventListener("change", (event) => {
