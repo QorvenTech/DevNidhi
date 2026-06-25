@@ -1,27 +1,27 @@
-{
-  "name": "DevNidhi - Mandir Nirman Kosh",
-  "short_name": "DevNidhi",
-  "description": "Temple construction donation and expense management",
-  "lang": "hi-IN",
-  "dir": "ltr",
-  "theme_color": "#D4580A",
-  "background_color": "#ffffff",
-  "display": "standalone",
-  "orientation": "portrait-primary",
-  "start_url": "/",
-  "scope": "/",
-  "icons": [
-    {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+﻿{
+    "name":  "DevNidhi - Mandir Nirman Kosh",
+    "short_name":  "DevNidhi",
+    "description":  "Temple construction donation and expense management",
+    "lang":  "hi-IN",
+    "dir":  "ltr",
+    "theme_color":  "#D4580A",
+    "background_color":  "#ffffff",
+    "display":  "standalone",
+    "orientation":  "portrait-primary",
+    "start_url":  "/DevNidhi/",
+    "scope":  "/DevNidhi/",
+    "icons":  [
+                  {
+                      "src":  "./icon-192.png",
+                      "sizes":  "192x192",
+                      "type":  "image/png",
+                      "purpose":  "any maskable"
+                  },
+                  {
+                      "src":  "./icon-512.png",
+                      "sizes":  "512x512",
+                      "type":  "image/png",
+                      "purpose":  "any maskable"
+                  }
+              ]
 }

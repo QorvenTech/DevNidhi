@@ -631,7 +631,7 @@
       left: 0;
       z-index: 40;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 4px;
       padding: 8px max(12px, env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom));
       background: rgba(255, 255, 255, 0.96);
@@ -772,7 +772,7 @@
       }
 
       .summary-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
       }
 
       .summary-card {
@@ -831,7 +831,30 @@
         transition-duration: 0.01ms !important;
       }
     }
-  </style>
+
+    /* ---------- Google account and temple workspaces ---------- */
+    .workspace-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; padding:13px 16px; background:#fff; border:1px solid var(--border); border-radius:15px; box-shadow:var(--shadow); }
+    .workspace-bar > div, .workspace-id-row > div { display:flex; min-width:0; flex-direction:column; }
+    .workspace-label { color:var(--muted); font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+    .workspace-bar strong, .workspace-id-row strong { overflow-wrap:anywhere; }
+    .role-badge { display:inline-flex; align-items:center; width:max-content; padding:5px 10px; color:var(--primary-dark); background:var(--primary-soft); border-radius:999px; font-size:.72rem; font-weight:700; text-transform:capitalize; }
+    .google-button { display:flex; align-items:center; justify-content:center; gap:12px; width:100%; min-height:52px; margin-top:18px; color:#302b28; background:#fff; border:1px solid #d8d3cf; border-radius:13px; font-weight:600; box-shadow:0 5px 14px rgba(44,33,27,.08); }
+    .google-button:hover { border-color:var(--primary); }
+    .google-button svg { width:23px; height:23px; }
+    .privacy-note { margin:14px 0 0 !important; color:var(--muted); font-size:.78rem; line-height:1.5; text-align:left !important; }
+    .onboarding-grid { display:grid; grid-template-columns:1fr; gap:16px; }
+    .full-button { width:100%; margin-top:14px; }
+    .temple-switcher { display:grid; gap:9px; }
+    .temple-choice { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:14px; color:var(--text); background:#fffcfa; border:1px solid var(--border); border-radius:13px; text-align:left; }
+    .temple-choice span { color:var(--muted); font-size:.75rem; text-transform:capitalize; }
+    .temple-choice.active { color:var(--primary-dark); background:var(--primary-soft); border-color:var(--primary); }
+    .workspace-id-row { display:flex; flex-direction:column; align-items:stretch; gap:12px; }
+    .member-row { display:flex; flex-direction:column; gap:12px; padding:14px; background:#fffcfa; border:1px solid var(--border); border-radius:14px; }
+    .member-row > div:first-child { display:flex; min-width:0; flex-direction:column; }
+    .member-row span:not(.role-badge) { color:var(--muted); font-size:.76rem; overflow-wrap:anywhere; }
+    .approval-actions { display:flex; flex-wrap:wrap; gap:7px; }
+    .compact { min-height:38px; padding:7px 10px; font-size:.72rem; }
+    @media (min-width:640px) { .onboarding-grid { grid-template-columns:repeat(2,1fr); } .workspace-id-row,.member-row { flex-direction:row; align-items:center; justify-content:space-between; } }  </style>
 </head>
 
 <body>
@@ -852,12 +875,16 @@
     </div>
 
     <div class="header-actions">
-      <button id="login-header-button" class="auth-button" type="button">Admin Login</button>
+      <button id="account-button" class="auth-button" type="button">Sign in</button>
       <button id="logout-button" class="auth-button logout hidden" type="button">Logout</button>
     </div>
   </header>
 
   <main class="app-main">
+    <div id="workspace-bar" class="workspace-bar hidden">
+      <div><span class="workspace-label">Temple workspace</span><strong id="workspace-name">—</strong></div>
+      <span id="workspace-role" class="role-badge">Viewer</span>
+    </div>
     <!-- Dashboard screen -->
     <section id="dashboard-screen" class="screen active" aria-labelledby="dashboard-title">
       <div class="welcome-card">
@@ -1034,26 +1061,48 @@
       </section>
     </section>
 
-    <!-- Admin login screen -->
-    <section id="login-screen" class="screen" aria-labelledby="login-title">
+    <!-- Google account sign-in screen -->
+    <section id="account-screen" class="screen" aria-labelledby="account-title">
       <div class="login-shell">
         <div class="login-card">
           <img class="login-logo" src="./logo.svg" alt="">
-          <h2 id="login-title">Admin Login</h2>
-          <p>केवल अधिकृत समिति सदस्य</p>
-          <form id="login-form">
-            <div class="form-field">
-              <label for="admin-email">Email</label>
-              <input id="admin-email" name="email" type="email" autocomplete="username" required>
-            </div>
-            <div class="form-field" style="margin-top: 13px;">
-              <label for="admin-password">Password</label>
-              <input id="admin-password" name="password" type="password" autocomplete="current-password" required minlength="6">
-            </div>
-            <button id="login-submit" class="primary-button login-submit" type="submit">Sign In</button>
-          </form>
+          <h2 id="account-title">Welcome to DevNidhi</h2>
+          <p>अपने Google खाते से सुरक्षित रूप से जारी रखें</p>
+          <button id="google-signin-button" class="google-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.5-.2-2.2H12v4.3h5.4a4.6 4.6 0 0 1-2 3v2.8h3.3c1.9-1.8 2.9-4.4 2.9-7.9Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.3-2.8c-.9.6-2.1 1-3.4 1a5.9 5.9 0 0 1-5.5-4.1H3.1v2.9A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.5 13.7a6 6 0 0 1 0-3.8V7H3.1a10 10 0 0 0 0 9.6Z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.8A9.7 9.7 0 0 0 3.1 7l3.4 2.9A5.9 5.9 0 0 1 12 5.9Z"/></svg>
+            Continue with Google
+          </button>
+          <p class="privacy-note">Your temple records are securely stored in Firebase and linked to your Google account.</p>
         </div>
       </div>
+    </section>
+
+    <!-- Temple workspace and member management -->
+    <section id="temple-screen" class="screen" aria-labelledby="temple-title">
+      <h2 id="temple-title" class="page-heading">Temple Workspace</h2>
+      <p class="page-subtitle">अपना मंदिर चुनें या समिति सदस्यों को जोड़ें</p>
+
+      <div id="workspace-onboarding" class="onboarding-grid">
+        <section class="section-card">
+          <h3 class="section-title">Create a Temple</h3>
+          <form id="create-temple-form">
+            <div class="form-field"><label for="temple-name-input">Temple / Project Name</label><input id="temple-name-input" name="templeName" type="text" maxlength="100" placeholder="e.g. Shri Ram Mandir Nirman" required></div>
+            <button class="primary-button full-button" type="submit">Create Workspace</button>
+          </form>
+        </section>
+        <section class="section-card">
+          <h3 class="section-title">Join a Temple</h3>
+          <form id="join-temple-form">
+            <div class="form-field"><label for="temple-id-input">Workspace ID</label><input id="temple-id-input" name="templeId" type="text" maxlength="40" placeholder="Paste ID shared by temple owner" required></div>
+            <button class="secondary-button full-button" type="submit">Request Access</button>
+          </form>
+        </section>
+      </div>
+
+      <section id="my-temples-card" class="section-card hidden"><h3 class="section-title">My Temples</h3><div id="temple-switcher" class="temple-switcher"></div></section>
+      <section id="active-temple-card" class="section-card hidden"><div class="workspace-id-row"><div><span class="workspace-label">Share this workspace ID</span><strong id="workspace-id">—</strong></div><button id="copy-workspace-id" class="secondary-button" type="button">Copy ID</button></div><p class="privacy-note">New members request access with this ID. The owner must approve them before they can see any records.</p></section>
+      <section id="requests-card" class="section-card hidden"><h3 class="section-title">Pending Access Requests</h3><div id="requests-list" class="entry-list"></div></section>
+      <section id="members-card" class="section-card hidden"><h3 class="section-title">Committee Members</h3><div id="members-list" class="entry-list"></div></section>
     </section>
   </main>
 
@@ -1078,7 +1127,10 @@
       </svg>
       Kharcha
     </button>
-  </nav>
+    <button class="nav-button" type="button" data-screen="temple">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18M5 21V10l7-6 7 6v11M9 21v-6h6v6"/></svg>
+      Temple
+    </button>  </nav>
 
   <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
     <div class="loading-box">
@@ -1089,603 +1141,6 @@
 
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-  <script type="module">
-    /*
-     * DevNidhi application
-     * Uses Firebase modular SDK, Firestore real-time listeners and Firebase Auth.
-     * No application data is stored in localStorage.
-     */
-    import { firebaseConfig } from "./firebase-config.js";
-
-    const FIREBASE_VERSION = "10.12.2";
-    const FIREBASE_BASE = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}`;
-
-    const state = {
-      user: null,
-      db: null,
-      auth: null,
-      firebase: null,
-      chanda: [],
-      kharcha: [],
-      editingChandaId: null,
-      editingKharchaId: null,
-      dataReady: { chanda: false, kharcha: false },
-      configured: false
-    };
-
-    const elements = {
-      loading: document.querySelector("#loading-overlay"),
-      offlineBanner: document.querySelector("#offline-banner"),
-      configBanner: document.querySelector("#config-banner"),
-      toastContainer: document.querySelector("#toast-container"),
-      loginHeaderButton: document.querySelector("#login-header-button"),
-      logoutButton: document.querySelector("#logout-button"),
-      bottomNav: document.querySelector("#bottom-nav"),
-      screens: document.querySelectorAll(".screen"),
-      navButtons: document.querySelectorAll(".nav-button"),
-      chandaAdminPanel: document.querySelector("#chanda-admin-panel"),
-      kharchaAdminPanel: document.querySelector("#kharcha-admin-panel"),
-      chandaForm: document.querySelector("#chanda-form"),
-      kharchaForm: document.querySelector("#kharcha-form"),
-      loginForm: document.querySelector("#login-form"),
-      chandaList: document.querySelector("#chanda-list"),
-      kharchaList: document.querySelector("#kharcha-list"),
-      chandaSearch: document.querySelector("#chanda-search"),
-      kharchaSearch: document.querySelector("#kharcha-search"),
-      chandaCancel: document.querySelector("#chanda-cancel"),
-      kharchaCancel: document.querySelector("#kharcha-cancel")
-    };
-
-    // ---------- Formatting and safe rendering helpers ----------
-    const currencyFormatter = new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 2
-    });
-
-    function formatCurrency(value) {
-      return currencyFormatter.format(Number(value) || 0);
-    }
-
-    function formatDate(value) {
-      const date = value?.toDate ? value.toDate() : new Date(value);
-      if (Number.isNaN(date.getTime())) return "—";
-      return new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      }).format(date);
-    }
-
-    function dateToInputValue(value) {
-      const date = value?.toDate ? value.toDate() : new Date(value);
-      if (Number.isNaN(date.getTime())) return getTodayValue();
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    }
-
-    function getTodayValue() {
-      const now = new Date();
-      const offset = now.getTimezoneOffset();
-      return new Date(now.getTime() - offset * 60_000).toISOString().slice(0, 10);
-    }
-
-    function escapeHtml(value = "") {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function showToast(message, type = "") {
-      const toast = document.createElement("div");
-      toast.className = `toast ${type}`.trim();
-      toast.textContent = message;
-      elements.toastContainer.appendChild(toast);
-      window.setTimeout(() => toast.remove(), 3600);
-    }
-
-    function setButtonBusy(button, busy, busyText) {
-      if (!button) return;
-      if (busy) {
-        button.dataset.originalText = button.textContent;
-        button.textContent = busyText;
-        button.disabled = true;
-      } else {
-        button.textContent = button.dataset.originalText || button.textContent;
-        button.disabled = false;
-      }
-    }
-
-    function firebaseIsConfigured() {
-      const required = ["apiKey", "authDomain", "projectId", "appId"];
-      return required.every((key) => {
-        const value = firebaseConfig[key];
-        return value && !String(value).startsWith("YOUR_");
-      });
-    }
-
-    // ---------- Navigation ----------
-    function showScreen(screenName) {
-      elements.screens.forEach((screen) => {
-        screen.classList.toggle("active", screen.id === `${screenName}-screen`);
-      });
-      elements.navButtons.forEach((button) => {
-        button.classList.toggle("active", button.dataset.screen === screenName);
-      });
-      elements.bottomNav.classList.toggle("hidden", screenName === "login");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    elements.navButtons.forEach((button) => {
-      button.addEventListener("click", () => showScreen(button.dataset.screen));
-    });
-
-    elements.loginHeaderButton.addEventListener("click", () => showScreen("login"));
-
-    // ---------- Dashboard and lists ----------
-    function renderDashboard() {
-      const totalChanda = state.chanda.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-      const totalKharcha = state.kharcha.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-      const uniqueDonors = new Set(
-        state.chanda.map((item) => String(item.donorName || "").trim().toLocaleLowerCase("en-IN")).filter(Boolean)
-      );
-
-      document.querySelector("#total-chanda").textContent = formatCurrency(totalChanda);
-      document.querySelector("#total-kharcha").textContent = formatCurrency(totalKharcha);
-      document.querySelector("#net-balance").textContent = formatCurrency(totalChanda - totalKharcha);
-      document.querySelector("#total-donors").textContent = String(uniqueDonors.size);
-      document.querySelector("#total-expenses").textContent = String(state.kharcha.length);
-    }
-
-    const editIcon = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
-      </svg>`;
-    const deleteIcon = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7M14 10v7"/>
-      </svg>`;
-
-    function renderChandaList() {
-      const term = elements.chandaSearch.value.trim().toLocaleLowerCase("en-IN");
-      const filtered = state.chanda.filter((entry) =>
-        String(entry.donorName || "").toLocaleLowerCase("en-IN").includes(term)
-      );
-
-      if (!filtered.length) {
-        elements.chandaList.innerHTML = `<div class="empty-state">${
-          term ? "No matching donor found." : "No donation entries yet."
-        }</div>`;
-        return;
-      }
-
-      elements.chandaList.innerHTML = filtered.map((entry) => `
-        <article class="entry-card">
-          <div class="entry-main">
-            <div class="entry-title-row">
-              <h4 class="entry-title">${escapeHtml(entry.donorName)}</h4>
-              <p class="entry-amount income">${formatCurrency(entry.amount)}</p>
-            </div>
-            <div class="entry-meta">
-              <span class="meta-chip">${formatDate(entry.date)}</span>
-              <span class="meta-chip">${escapeHtml(entry.paymentMode)}</span>
-            </div>
-            ${entry.note ? `<p class="entry-note">${escapeHtml(entry.note)}</p>` : ""}
-          </div>
-          ${state.user ? `
-            <div class="entry-actions">
-              <button class="icon-button" type="button" data-action="edit-chanda" data-id="${entry.id}" aria-label="Edit donation">${editIcon}</button>
-              <button class="icon-button delete" type="button" data-action="delete-chanda" data-id="${entry.id}" aria-label="Delete donation">${deleteIcon}</button>
-            </div>` : ""}
-        </article>
-      `).join("");
-    }
-
-    function renderKharchaList() {
-      const term = elements.kharchaSearch.value.trim().toLocaleLowerCase("en-IN");
-      const filtered = state.kharcha.filter((entry) =>
-        String(entry.description || "").toLocaleLowerCase("en-IN").includes(term)
-      );
-
-      if (!filtered.length) {
-        elements.kharchaList.innerHTML = `<div class="empty-state">${
-          term ? "No matching expense found." : "No expense entries yet."
-        }</div>`;
-        return;
-      }
-
-      elements.kharchaList.innerHTML = filtered.map((entry) => `
-        <article class="entry-card">
-          <div class="entry-main">
-            <div class="entry-title-row">
-              <h4 class="entry-title">${escapeHtml(entry.description)}</h4>
-              <p class="entry-amount outgoing">${formatCurrency(entry.amount)}</p>
-            </div>
-            <div class="entry-meta">
-              <span class="meta-chip">${formatDate(entry.date)}</span>
-              <span class="meta-chip">${escapeHtml(entry.category)}</span>
-            </div>
-            ${entry.note ? `<p class="entry-note">${escapeHtml(entry.note)}</p>` : ""}
-          </div>
-          ${state.user ? `
-            <div class="entry-actions">
-              <button class="icon-button" type="button" data-action="edit-kharcha" data-id="${entry.id}" aria-label="Edit expense">${editIcon}</button>
-              <button class="icon-button delete" type="button" data-action="delete-kharcha" data-id="${entry.id}" aria-label="Delete expense">${deleteIcon}</button>
-            </div>` : ""}
-        </article>
-      `).join("");
-    }
-
-    function renderAll() {
-      renderDashboard();
-      renderChandaList();
-      renderKharchaList();
-    }
-
-    elements.chandaSearch.addEventListener("input", renderChandaList);
-    elements.kharchaSearch.addEventListener("input", renderKharchaList);
-
-    // ---------- Admin state and form reset ----------
-    function updateAuthUI(user) {
-      state.user = user;
-      const isAdmin = Boolean(user);
-      elements.loginHeaderButton.classList.toggle("hidden", isAdmin);
-      elements.logoutButton.classList.toggle("hidden", !isAdmin);
-      elements.chandaAdminPanel.classList.toggle("hidden", !isAdmin);
-      elements.kharchaAdminPanel.classList.toggle("hidden", !isAdmin);
-      if (!isAdmin) {
-        resetChandaForm();
-        resetKharchaForm();
-      }
-      renderChandaList();
-      renderKharchaList();
-    }
-
-    function resetChandaForm() {
-      state.editingChandaId = null;
-      elements.chandaForm.reset();
-      document.querySelector("#chanda-date").value = getTodayValue();
-      document.querySelector("#chanda-form-title").textContent = "Add Chanda";
-      document.querySelector("#chanda-submit").textContent = "Save Chanda";
-      elements.chandaCancel.classList.add("hidden");
-    }
-
-    function resetKharchaForm() {
-      state.editingKharchaId = null;
-      elements.kharchaForm.reset();
-      document.querySelector("#kharcha-date").value = getTodayValue();
-      document.querySelector("#kharcha-form-title").textContent = "Add Kharcha";
-      document.querySelector("#kharcha-submit").textContent = "Save Kharcha";
-      elements.kharchaCancel.classList.add("hidden");
-    }
-
-    resetChandaForm();
-    resetKharchaForm();
-
-    // ---------- Firebase initialization ----------
-    async function initializeFirebase() {
-      if (!firebaseIsConfigured()) {
-        state.configured = false;
-        elements.configBanner.classList.add("show");
-        elements.loading.classList.add("hidden");
-        showToast("Firebase credentials अभी जोड़नी बाकी हैं।", "error");
-        return;
-      }
-
-      try {
-        const [
-          appModule,
-          firestoreModule,
-          authModule
-        ] = await Promise.all([
-          import(`${FIREBASE_BASE}/firebase-app.js`),
-          import(`${FIREBASE_BASE}/firebase-firestore.js`),
-          import(`${FIREBASE_BASE}/firebase-auth.js`)
-        ]);
-
-        const app = appModule.initializeApp(firebaseConfig);
-
-        // Firestore persistent cache uses IndexedDB, not localStorage.
-        // It keeps previously synced records viewable while offline.
-        let db;
-        try {
-          db = firestoreModule.initializeFirestore(app, {
-            localCache: firestoreModule.persistentLocalCache({
-              tabManager: firestoreModule.persistentMultipleTabManager()
-            })
-          });
-        } catch (cacheError) {
-          console.warn("Persistent cache unavailable; using standard Firestore instance.", cacheError);
-          db = firestoreModule.getFirestore(app);
-        }
-
-        state.db = db;
-        state.auth = authModule.getAuth(app);
-        state.firebase = { ...firestoreModule, ...authModule };
-        state.configured = true;
-
-        authModule.onAuthStateChanged(state.auth, (user) => {
-          updateAuthUI(user);
-          if (user && document.querySelector("#login-screen").classList.contains("active")) {
-            showScreen("dashboard");
-          }
-        });
-
-        subscribeToCollections();
-      } catch (error) {
-        console.error("Firebase initialization failed:", error);
-        elements.loading.classList.add("hidden");
-        showToast("Firebase शुरू नहीं हो सका। Configuration और internet जाँचें।", "error");
-      }
-    }
-
-    function subscribeToCollections() {
-      const { collection, query, orderBy, onSnapshot } = state.firebase;
-
-      const chandaQuery = query(collection(state.db, "chanda"), orderBy("date", "desc"));
-      const kharchaQuery = query(collection(state.db, "kharcha"), orderBy("date", "desc"));
-
-      onSnapshot(chandaQuery, { includeMetadataChanges: true }, (snapshot) => {
-        state.chanda = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
-        state.dataReady.chanda = true;
-        renderAll();
-        finishInitialLoading();
-      }, handleSnapshotError);
-
-      onSnapshot(kharchaQuery, { includeMetadataChanges: true }, (snapshot) => {
-        state.kharcha = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
-        state.dataReady.kharcha = true;
-        renderAll();
-        finishInitialLoading();
-      }, handleSnapshotError);
-    }
-
-    function handleSnapshotError(error) {
-      console.error("Firestore listener error:", error);
-      elements.loading.classList.add("hidden");
-      if (error.code === "permission-denied") {
-        showToast("Firestore rules data पढ़ने की अनुमति नहीं दे रहे हैं।", "error");
-      } else {
-        showToast("डेटा लोड नहीं हुआ। Internet और Firebase settings जाँचें।", "error");
-      }
-    }
-
-    function finishInitialLoading() {
-      if (state.dataReady.chanda && state.dataReady.kharcha) {
-        elements.loading.classList.add("hidden");
-      }
-    }
-
-    // ---------- Authentication ----------
-    elements.loginForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!state.configured) {
-        showToast("पहले Firebase configuration जोड़ें।", "error");
-        return;
-      }
-
-      const submitButton = document.querySelector("#login-submit");
-      const formData = new FormData(elements.loginForm);
-      setButtonBusy(submitButton, true, "Signing in...");
-
-      try {
-        await state.firebase.signInWithEmailAndPassword(
-          state.auth,
-          String(formData.get("email")).trim(),
-          String(formData.get("password"))
-        );
-        elements.loginForm.reset();
-        showToast("Admin login successful.", "success");
-        showScreen("dashboard");
-      } catch (error) {
-        console.error("Login failed:", error);
-        showToast("Email या password सही नहीं है।", "error");
-      } finally {
-        setButtonBusy(submitButton, false);
-      }
-    });
-
-    elements.logoutButton.addEventListener("click", async () => {
-      if (!state.auth) return;
-      try {
-        await state.firebase.signOut(state.auth);
-        showToast("Logged out successfully.", "success");
-        showScreen("dashboard");
-      } catch (error) {
-        console.error("Logout failed:", error);
-        showToast("Logout नहीं हो सका।", "error");
-      }
-    });
-
-    // ---------- Create and update records ----------
-    function inputDateToTimestamp(dateValue) {
-      // Noon local time avoids timezone shifts changing the selected calendar date.
-      return state.firebase.Timestamp.fromDate(new Date(`${dateValue}T12:00:00`));
-    }
-
-    elements.chandaForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!state.user || !state.configured) return;
-
-      const button = document.querySelector("#chanda-submit");
-      const data = new FormData(elements.chandaForm);
-      const amount = Number(data.get("amount"));
-      if (!Number.isFinite(amount) || amount <= 0) {
-        showToast("कृपया सही राशि दर्ज करें।", "error");
-        return;
-      }
-
-      const record = {
-        donorName: String(data.get("donorName")).trim(),
-        amount,
-        date: inputDateToTimestamp(data.get("date")),
-        paymentMode: String(data.get("paymentMode")),
-        note: String(data.get("note")).trim()
-      };
-
-      setButtonBusy(button, true, "Saving...");
-      try {
-        if (state.editingChandaId) {
-          const reference = state.firebase.doc(state.db, "chanda", state.editingChandaId);
-          await state.firebase.updateDoc(reference, record);
-          showToast("Chanda entry updated.", "success");
-        } else {
-          await state.firebase.addDoc(state.firebase.collection(state.db, "chanda"), {
-            ...record,
-            createdAt: state.firebase.serverTimestamp()
-          });
-          showToast("Chanda entry saved.", "success");
-        }
-        resetChandaForm();
-      } catch (error) {
-        console.error("Saving donation failed:", error);
-        showToast("Chanda save नहीं हुआ। कृपया फिर प्रयास करें।", "error");
-      } finally {
-        setButtonBusy(button, false);
-      }
-    });
-
-    elements.kharchaForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!state.user || !state.configured) return;
-
-      const button = document.querySelector("#kharcha-submit");
-      const data = new FormData(elements.kharchaForm);
-      const amount = Number(data.get("amount"));
-      if (!Number.isFinite(amount) || amount <= 0) {
-        showToast("कृपया सही राशि दर्ज करें।", "error");
-        return;
-      }
-
-      const record = {
-        description: String(data.get("description")).trim(),
-        amount,
-        date: inputDateToTimestamp(data.get("date")),
-        category: String(data.get("category")),
-        note: String(data.get("note")).trim()
-      };
-
-      setButtonBusy(button, true, "Saving...");
-      try {
-        if (state.editingKharchaId) {
-          const reference = state.firebase.doc(state.db, "kharcha", state.editingKharchaId);
-          await state.firebase.updateDoc(reference, record);
-          showToast("Kharcha entry updated.", "success");
-        } else {
-          await state.firebase.addDoc(state.firebase.collection(state.db, "kharcha"), {
-            ...record,
-            createdAt: state.firebase.serverTimestamp()
-          });
-          showToast("Kharcha entry saved.", "success");
-        }
-        resetKharchaForm();
-      } catch (error) {
-        console.error("Saving expense failed:", error);
-        showToast("Kharcha save नहीं हुआ। कृपया फिर प्रयास करें।", "error");
-      } finally {
-        setButtonBusy(button, false);
-      }
-    });
-
-    elements.chandaCancel.addEventListener("click", resetChandaForm);
-    elements.kharchaCancel.addEventListener("click", resetKharchaForm);
-
-    // ---------- Edit and delete event delegation ----------
-    elements.chandaList.addEventListener("click", async (event) => {
-      const button = event.target.closest("button[data-action]");
-      if (!button || !state.user) return;
-      const entry = state.chanda.find((item) => item.id === button.dataset.id);
-      if (!entry) return;
-
-      if (button.dataset.action === "edit-chanda") {
-        state.editingChandaId = entry.id;
-        document.querySelector("#donor-name").value = entry.donorName || "";
-        document.querySelector("#chanda-amount").value = entry.amount || "";
-        document.querySelector("#chanda-date").value = dateToInputValue(entry.date);
-        document.querySelector("#payment-mode").value = entry.paymentMode || "Cash";
-        document.querySelector("#chanda-note").value = entry.note || "";
-        document.querySelector("#chanda-form-title").textContent = "Edit Chanda";
-        document.querySelector("#chanda-submit").textContent = "Update Chanda";
-        elements.chandaCancel.classList.remove("hidden");
-        elements.chandaAdminPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-
-      if (button.dataset.action === "delete-chanda") {
-        const confirmed = window.confirm(`Delete donation from "${entry.donorName}"? This cannot be undone.`);
-        if (!confirmed) return;
-        try {
-          await state.firebase.deleteDoc(state.firebase.doc(state.db, "chanda", entry.id));
-          showToast("Chanda entry deleted.", "success");
-        } catch (error) {
-          console.error("Deleting donation failed:", error);
-          showToast("Entry delete नहीं हुई।", "error");
-        }
-      }
-    });
-
-    elements.kharchaList.addEventListener("click", async (event) => {
-      const button = event.target.closest("button[data-action]");
-      if (!button || !state.user) return;
-      const entry = state.kharcha.find((item) => item.id === button.dataset.id);
-      if (!entry) return;
-
-      if (button.dataset.action === "edit-kharcha") {
-        state.editingKharchaId = entry.id;
-        document.querySelector("#expense-description").value = entry.description || "";
-        document.querySelector("#kharcha-amount").value = entry.amount || "";
-        document.querySelector("#kharcha-date").value = dateToInputValue(entry.date);
-        document.querySelector("#expense-category").value = entry.category || "Other";
-        document.querySelector("#kharcha-note").value = entry.note || "";
-        document.querySelector("#kharcha-form-title").textContent = "Edit Kharcha";
-        document.querySelector("#kharcha-submit").textContent = "Update Kharcha";
-        elements.kharchaCancel.classList.remove("hidden");
-        elements.kharchaAdminPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-
-      if (button.dataset.action === "delete-kharcha") {
-        const confirmed = window.confirm(`Delete expense "${entry.description}"? This cannot be undone.`);
-        if (!confirmed) return;
-        try {
-          await state.firebase.deleteDoc(state.firebase.doc(state.db, "kharcha", entry.id));
-          showToast("Kharcha entry deleted.", "success");
-        } catch (error) {
-          console.error("Deleting expense failed:", error);
-          showToast("Entry delete नहीं हुई।", "error");
-        }
-      }
-    });
-
-    // ---------- Connectivity and PWA ----------
-    function updateOnlineStatus() {
-      elements.offlineBanner.classList.toggle("show", !navigator.onLine);
-      if (navigator.onLine && state.configured) {
-        console.info("Back online. Firestore will synchronize pending changes.");
-      }
-    }
-
-    window.addEventListener("online", () => {
-      updateOnlineStatus();
-      showToast("Internet वापस आ गया — data sync हो रहा है।", "success");
-    });
-    window.addEventListener("offline", updateOnlineStatus);
-    updateOnlineStatus();
-
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", async () => {
-        try {
-          await navigator.serviceWorker.register("./service-worker.js");
-        } catch (error) {
-          console.warn("Service worker registration failed:", error);
-        }
-      });
-    }
-
-    initializeFirebase();
-  </script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Firebase web app configuration
  *
  * Configuration for the DevNidhi Firebase project.
