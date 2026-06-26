@@ -22,7 +22,7 @@ const elements = {
   chandaSearch: $("#chanda-search"), kharchaSearch: $("#kharcha-search"), chandaCancel: $("#chanda-cancel"), kharchaCancel: $("#kharcha-cancel"),
   createTempleForm: $("#create-temple-form"), joinTempleForm: $("#join-temple-form"), templeSwitcher: $("#temple-switcher"),
   myTemplesCard: $("#my-temples-card"), activeTempleCard: $("#active-temple-card"), workspaceId: $("#workspace-id"), renameTempleForm: $("#rename-temple-form"), renameTempleInput: $("#rename-temple-input"),
-  requestsCard: $("#requests-card"), requestsList: $("#requests-list"), membersCard: $("#members-card"), membersList: $("#members-list"), dangerZone: $("#danger-zone"), deleteTempleButton: $("#delete-temple-button")
+  requestsCard: $("#requests-card"), requestsList: $("#requests-list"), membersCard: $("#members-card"), membersList: $("#members-list")
 };
 
 const money = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 });
@@ -83,7 +83,6 @@ function renderWorkspace() {
   elements.activeTempleCard.classList.toggle("hidden", !active); elements.membersCard.classList.toggle("hidden", !active);
   elements.renameTempleForm.classList.toggle("hidden", !active || !isOwner());
   elements.requestsCard.classList.toggle("hidden", !active || !isOwner());
-  elements.dangerZone.classList.toggle("hidden", !active || !isOwner());
   if (active) { elements.workspaceName.textContent = active.templeName; elements.workspaceRole.textContent = active.role[0].toUpperCase() + active.role.slice(1); elements.workspaceId.textContent = active.templeId; elements.renameTempleInput.value = active.templeName; }
   elements.templeSwitcher.innerHTML = state.memberships.map((m) => `<button class="temple-choice ${m.templeId === active?.templeId ? "active" : ""}" data-temple-id="${m.templeId}"><strong>${escapeHtml(m.templeName)}</strong><span>${escapeHtml(m.role)}</span></button>`).join("");
   elements.membersList.innerHTML = state.members.length ? state.members.map((m) => {
@@ -254,59 +253,6 @@ async function removeMember(memberId) {
   }
 }
 
-async function deleteCollectionDocuments(collectionRef) {
-  const snapshot = await state.f.getDocs(collectionRef);
-  for (let start = 0; start < snapshot.docs.length; start += 400) {
-    const batch = state.f.writeBatch(state.db);
-    snapshot.docs.slice(start, start + 400).forEach((document) => batch.delete(document.ref));
-    await batch.commit();
-  }
-}
-
-async function deleteTempleWorkspace() {
-  if (!isOwner()) return;
-  const temple = state.activeMembership;
-  const typedName = prompt(`This permanently deletes everything in "${temple.templeName}".\n\nType the temple name exactly to confirm:`);
-  if (typedName === null) return;
-  if (typedName.trim() !== temple.templeName) {
-    toast("Temple name did not match. Nothing was deleted.", "error");
-    return;
-  }
-  if (!confirm("Final confirmation: permanently delete this workspace and all its records?")) return;
-  busy(elements.deleteTempleButton, true, "Deleting...");
-  const templeId = temple.templeId;
-  try {
-    clearWorkspaceListeners();
-    await deleteCollectionDocuments(state.f.collection(state.db, "temples", templeId, "chanda"));
-    await deleteCollectionDocuments(state.f.collection(state.db, "temples", templeId, "kharcha"));
-    await deleteCollectionDocuments(state.f.collection(state.db, "temples", templeId, "joinRequests"));
-
-    const membershipSnapshot = await state.f.getDocs(state.f.query(state.f.collection(state.db, "memberships"), state.f.where("templeId", "==", templeId)));
-    const nonOwnerMembers = membershipSnapshot.docs.filter((document) => document.data().role !== "owner");
-    for (let start = 0; start < nonOwnerMembers.length; start += 400) {
-      const batch = state.f.writeBatch(state.db);
-      nonOwnerMembers.slice(start, start + 400).forEach((document) => batch.delete(document.ref));
-      await batch.commit();
-    }
-
-    const finalBatch = state.f.writeBatch(state.db);
-    finalBatch.delete(state.f.doc(state.db, "temples", templeId));
-    finalBatch.delete(state.f.doc(state.db, "memberships", membershipId(state.user.uid, templeId)));
-    await finalBatch.commit();
-
-    state.activeMembership = null;
-    state.memberships = state.memberships.filter((item) => item.templeId !== templeId);
-    renderWorkspace();
-    showScreen("temple");
-    toast("Temple workspace permanently deleted.", "success");
-  } catch (error) {
-    console.error(error);
-    toast("Workspace deletion failed. Please try again.", "error");
-    subscribeMemberships();
-  } finally {
-    busy(elements.deleteTempleButton, false);
-  }
-}
 function resetChanda(){state.editingChandaId=null;elements.chandaForm.reset();$("#chanda-date").value=today();$("#chanda-form-title").textContent="Add Chanda";$("#chanda-submit").textContent="Save Chanda";elements.chandaCancel.classList.add("hidden");}
 function resetKharcha(){state.editingKharchaId=null;elements.kharchaForm.reset();$("#kharcha-date").value=today();$("#kharcha-form-title").textContent="Add Kharcha";$("#kharcha-submit").textContent="Save Kharcha";elements.kharchaCancel.classList.add("hidden");}
 async function saveChanda(event){event.preventDefault();if(!canEdit())return;const button=event.submitter,data=new FormData(event.currentTarget),amount=Number(data.get("amount"));if(!(amount>0))return toast("Enter a valid amount.","error");const record={donorName:String(data.get("donorName")).trim(),amount,date:timestampFromInput(data.get("date")),paymentMode:String(data.get("paymentMode")),note:String(data.get("note")).trim()};busy(button,true,"Saving...");try{const base=["temples",state.activeMembership.templeId,"chanda"];if(state.editingChandaId)await state.f.updateDoc(state.f.doc(state.db,...base,state.editingChandaId),record);else await state.f.addDoc(state.f.collection(state.db,...base),{...record,createdAt:state.f.serverTimestamp(),createdBy:state.user.uid});resetChanda();toast("Chanda saved.","success");}catch(e){console.error(e);toast("Chanda could not be saved.","error");}finally{busy(button,false);}}
@@ -331,7 +277,7 @@ elements.membersList.addEventListener("click", (event) => {
   const button = event.target.closest('button[data-action="remove-member"]');
   if (button) removeMember(button.dataset.memberId);
 });
-elements.deleteTempleButton.addEventListener("click", deleteTempleWorkspace);elements.requestsList.addEventListener("click",async(e)=>{const b=e.target.closest("button[data-action]");if(!b)return;if(b.dataset.action==="approve")await approveRequest(b.dataset.uid,b.dataset.role);if(b.dataset.action==="reject"&&confirm("Reject this access request?"))await state.f.deleteDoc(state.f.doc(state.db,"temples",state.activeMembership.templeId,"joinRequests",b.dataset.uid));});
+elements.requestsList.addEventListener("click",async(e)=>{const b=e.target.closest("button[data-action]");if(!b)return;if(b.dataset.action==="approve")await approveRequest(b.dataset.uid,b.dataset.role);if(b.dataset.action==="reject"&&confirm("Reject this access request?"))await state.f.deleteDoc(state.f.doc(state.db,"temples",state.activeMembership.templeId,"joinRequests",b.dataset.uid));});
 elements.chandaForm.addEventListener("submit",saveChanda);elements.kharchaForm.addEventListener("submit",saveKharcha);elements.chandaCancel.addEventListener("click",resetChanda);elements.kharchaCancel.addEventListener("click",resetKharcha);
 elements.chandaList.addEventListener("click",e=>handleEntryAction(e,"chanda"));elements.kharchaList.addEventListener("click",e=>handleEntryAction(e,"kharcha"));elements.chandaSearch.addEventListener("input",renderChanda);elements.kharchaSearch.addEventListener("input",renderKharcha);
 function onlineStatus(){elements.offlineBanner.classList.toggle("show",!navigator.onLine);} window.addEventListener("online",()=>{onlineStatus();toast("Back online — syncing data.","success");});window.addEventListener("offline",onlineStatus);onlineStatus();
