@@ -4,19 +4,18 @@
  * Firestore manages record-level offline persistence and synchronization.
  */
 
-const CACHE_VERSION = "devnidhi-v8";
+const CACHE_VERSION = "devnidhi-v9";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
   "./firebase-config.js",
-  "./app.js?v=8",
+  "./app.js?v=9",
   "./logo.svg",
   "./icon-192.png",
   "./icon-512.png"
 ];
 
-// Cache the local application shell during installation.
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_VERSION)
@@ -25,7 +24,6 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Remove old app-shell caches after an update.
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
@@ -41,10 +39,8 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
-
   const url = new URL(request.url);
 
-  // Navigation: network first, cached app page if offline.
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -53,15 +49,11 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE_VERSION).then((cache) => cache.put("./index.html", copy));
           return response;
         })
-        .catch(async () => (
-          await caches.match(request) ||
-          await caches.match("./index.html")
-        ))
+        .catch(async () => (await caches.match(request)) || (await caches.match("./index.html")))
     );
     return;
   }
 
-  // App assets and font/CDN resources: stale-while-revalidate.
   const shouldCache =
     url.origin === self.location.origin ||
     url.hostname === "fonts.googleapis.com" ||
@@ -81,16 +73,11 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => cachedResponse);
-
       return cachedResponse || networkResponse;
     })
   );
 });
 
-// A waiting service worker can be activated immediately by the page.
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
-
