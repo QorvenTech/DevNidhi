@@ -4,7 +4,7 @@
     "description":  "Temple construction donation and expense management",
     "lang":  "hi-IN",
     "dir":  "ltr",
-    "theme_color":  "#182340",
+    "theme_color":  "#1B2340",
     "background_color":  "#ffffff",
     "display":  "standalone",
     "orientation":  "portrait-primary",
@@ -25,4 +25,3 @@
                   }
               ]
 }
-
