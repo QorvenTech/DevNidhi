@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-  <title id="title">DevNidhi temple logo</title>
-  <desc id="desc">A saffron temple silhouette inside a warm cream circle</desc>
-  <rect width="512" height="512" rx="112" fill="#FFF6EE"/>
-  <circle cx="256" cy="256" r="206" fill="#D4580A"/>
-  <circle cx="256" cy="256" r="176" fill="#FFF9F4"/>
+  <title id="title">DevNidhi logo</title>
+  <desc id="desc">A navy temple resting on an open book with a rupee symbol, topped with a saffron flag</desc>
 
-  <!-- Temple flag and central shikhara -->
-  <path d="M254 82v55" fill="none" stroke="#A94105" stroke-width="12" stroke-linecap="round"/>
-  <path d="M260 86c35 2 48 17 67 14-12 25-38 30-67 19Z" fill="#D4580A"/>
-  <path d="M256 124 194 254h124Z" fill="#D4580A"/>
-  <path d="m256 153-38 87h76Z" fill="#ED8B35"/>
+  <!-- App icon background -->
+  <rect width="512" height="512" rx="112" fill="#1B2340"/>
 
-  <!-- Side temple roofs -->
-  <path d="m156 238-50 76h102Z" fill="#D4580A"/>
-  <path d="m356 238-52 76h102Z" fill="#D4580A"/>
-  <path d="M144 292h224v36H144Z" fill="#D4580A"/>
+  <!-- Flag pole and pennant -->
+  <path d="M256 70v70" fill="none" stroke="#FF8A00" stroke-width="10" stroke-linecap="round"/>
+  <path d="M256 74c26 2 36 14 50 12-9 19-29 23-50 15Z" fill="#FF8A00"/>
 
-  <!-- Temple body -->
-  <path d="M128 322h256v82H128Z" fill="#D4580A"/>
-  <path d="M104 394h304v38H104Z" fill="#A94105"/>
-  <path d="M82 426h348v28H82Z" fill="#D4580A"/>
+  <!-- Temple shikhara / dome -->
+  <path d="M256 140c-30 34-48 66-54 100h108c-6-34-24-66-54-100Z" fill="#FFF8EF"/>
+  <path d="M212 240h88l14 34H198Z" fill="#FFF8EF"/>
+  <circle cx="256" cy="168" r="8" fill="#1B2340"/>
 
-  <!-- Entrance and columns -->
-  <path d="M220 404v-56c0-22 16-40 36-40s36 18 36 40v56Z" fill="#FFF9F4"/>
-  <path d="M154 326h22v78h-22zm182 0h22v78h-22z" fill="#FFF9F4"/>
-  <circle cx="256" cy="207" r="12" fill="#FFF9F4"/>
+  <!-- Temple side pillars -->
+  <path d="M186 274h20v56h-20zm120 0h20v56h-20z" fill="#FFF8EF"/>
+
+  <!-- Open book base -->
+  <path d="M96 366c0-10 8-16 18-14 40 9 78 13 106 13V300c-28 0-66-6-106-17-10-3-18 3-18 13Z" fill="#FFF8EF"/>
+  <path d="M416 366c0-10-8-16-18-14-40 9-78 13-106 13V300c28 0 66-6 106-17 10-3 18 3 18 13Z" fill="#FFF8EF"/>
+  <path d="M220 296h72v70h-72z" fill="#EDE3D3"/>
+  <path d="M256 296v70" stroke="#C9BB9E" stroke-width="4"/>
+
+  <!-- Rupee mark on the book -->
+  <text x="256" y="358" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-weight="700" font-size="54" fill="#FF8A00">&#8377;</text>
 </svg>
