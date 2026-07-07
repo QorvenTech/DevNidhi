@@ -4,13 +4,13 @@
  * Firestore manages record-level offline persistence and synchronization.
  */
 
-const CACHE_VERSION = "devnidhi-v16";
+const CACHE_VERSION = "devnidhi-v17";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
   "./firebase-config.js",
-  "./app.js?v=14",
+  "./app.js?v=15",
   "./logo.svg",
   "./icon-192.png",
   "./icon-512.png"
