@@ -138,6 +138,27 @@ body:has(#chanda-screen.active) .nav-button.active{color:#FF7A00;font-weight:900
 body:has(#chanda-screen.active) .nav-button.active:after{display:none}
 body:has(#chanda-screen.active) .nav-button svg{width:25px;height:25px}
 @media(max-width:390px){#chanda-screen .chanda-header{padding-left:18px;padding-right:18px}#chanda-screen .chanda-card-head{grid-template-columns:auto minmax(0,1fr)}#chanda-screen .chanda-new-button{grid-column:1/-1;width:100%}#chanda-screen .chanda-field.half{grid-column:1/-1}#chanda-screen .chanda-list-head{grid-template-columns:1fr}#chanda-screen .chanda-stat{grid-template-columns:1fr;gap:8px}#chanda-screen .chanda-stat strong{font-size:1.08rem}#chanda-screen .chanda-row{grid-template-columns:auto minmax(0,1fr) auto;gap:8px}#chanda-screen .chanda-kebab{display:none}}
+
+/* ---- Readability and compactness hotfix ---- */
+.dashboard-stats .summary-label,.dashboard-stats .stat-foot,.balance-meta,.activity-meta{font-family:Poppins,'Noto Sans Devanagari',sans-serif;overflow-wrap:anywhere}
+.dashboard-stats .summary-card{overflow:hidden}
+#chanda-screen .chanda-header{min-height:132px;padding:22px 20px 28px}
+#chanda-screen .chanda-form-card{margin:-14px 14px 12px;padding:14px 12px}
+#chanda-screen .chanda-card-head{gap:10px;margin-bottom:12px}
+#chanda-screen .chanda-hand-icon{width:44px;height:44px}
+#chanda-screen .chanda-hand-icon svg{width:28px;height:28px}
+#chanda-screen #chanda-form-title{font-size:.98rem}
+#chanda-screen .chanda-card-head p{font-size:.74rem;line-height:1.25}
+#chanda-screen .chanda-new-button{min-height:38px;padding:7px 12px;font-size:.78rem}
+#chanda-screen .chanda-field{min-height:72px;padding:12px 38px 9px 66px}
+#chanda-screen .chanda-field.half{min-height:72px}
+#chanda-screen .chanda-field-icon{width:44px;height:44px;left:11px;top:13px}
+#chanda-screen .chanda-field label{font-size:.68rem;margin-bottom:6px}
+#chanda-screen .chanda-field input,#chanda-screen .chanda-field select,#chanda-screen .chanda-field textarea{font-size:.8rem}
+#chanda-screen #chanda-submit{min-height:46px}
+#chanda-screen .chanda-stat-grid{margin-top:8px}
+body:has(#chanda-screen.active) .app-main{padding-bottom:calc(126px + env(safe-area-inset-bottom))}
+@media(min-width:431px){.drawer{left:max(12px,calc((100vw - 430px)/2 - 346px));width:320px}body:has(.drawer.open) .drawer-backdrop{display:block}}
 </style>
 </head>
 <body>
@@ -157,7 +178,7 @@ body:has(#chanda-screen.active) .nav-button svg{width:25px;height:25px}
 <nav id="bottom-nav" class="bottom-nav" aria-label="Main navigation"><button class="nav-button active" type="button" data-screen="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>Dashboard</button><button class="nav-button" type="button" data-screen="chanda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11.5V20"/><path d="M3 18h4l4 3h5.5a3 3 0 0 0 2.6-1.5l1.4-2.5a1.8 1.8 0 0 0-2.8-2.1L16 17h-4"/><path d="M15.5 4.5c1.1-1.4 3.5-.7 3.5 1.4 0 2.4-3.5 4.5-3.5 4.5S12 8.3 12 5.9c0-2.1 2.4-2.8 3.5-1.4Z"/></svg>Chanda</button><button class="nav-button" type="button" data-screen="kharcha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H3z"/><path d="M16 12h6M16 15h1"/><path d="M7 7V5a3 3 0 0 1 5-2"/></svg>Kharcha</button><button class="nav-button" type="button" data-screen="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5"/><path d="M8 19v-7"/><path d="M12 19V8"/><path d="M16 19v-4"/><path d="M20 19V9"/></svg>Reports</button><button class="nav-button" type="button" data-screen="temple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Mandir / Team</button></nav>
 </div>
 <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite"><div class="loading-box"><div><img class="loading-logo" src="./logo.svg" alt=""><div class="loading-title">DevNidhi</div><div class="loading-subtitle">Mandir Nirman Kosh</div><p>Bhakti. Bharosa. Spasht Hisaab.</p><div id="loading-spinner-wrap"><div class="spinner"></div><span id="loading-text">DevNidhi loading...</span></div><button id="loading-retry" type="button" class="secondary-button hidden" style="margin-top:14px">Retry</button></div></div></div><div id="toast-container" class="toast-container" aria-live="polite"></div>
-<script type="module" src="./app.js?v=13"></script>
+<script type="module" src="./app.js?v=14"></script>
 <script>
 (function(){
   const drawer=document.getElementById('side-drawer'),backdrop=document.getElementById('drawer-backdrop'),menu=document.getElementById('menu-button');
